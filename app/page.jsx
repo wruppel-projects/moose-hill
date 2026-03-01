@@ -56,6 +56,7 @@ export default function App() {
   const [bookings, setBookings] = useState([]);
   const [activeRoom, setActiveRoom] = useState(ROOMS[0].id);
   const [calMonth, setCalMonth] = useState(() => { const n = new Date(); return { year: n.getFullYear(), month: n.getMonth() }; });
+  const [calViewMonth, setCalViewMonth] = useState(() => { const n = new Date(); return { year: n.getFullYear(), month: n.getMonth() }; });
   const [sel, setSel] = useState({ start: null, end: null, selecting: false });
   const [form, setForm] = useState({ name: "", guest2: "" });
   const [formError, setFormError] = useState("");
@@ -70,6 +71,7 @@ export default function App() {
 
   useEffect(() => {
     try { const s = localStorage.getItem(STORAGE_KEY); if (s) setBookings(JSON.parse(s)); } catch {}
+    try { if (sessionStorage.getItem("moosehill-unlocked") === "1") setUnlocked(true); } catch {}
   }, []);
   useEffect(() => {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings)); } catch {}
@@ -85,6 +87,10 @@ export default function App() {
   const canFwd = () => calMonth.year < maxYear || (calMonth.year === maxYear && calMonth.month < now.getMonth());
   const prevMonth = () => setCalMonth(p => p.month === 0 ? { year: p.year-1, month: 11 } : { year: p.year, month: p.month-1 });
   const nextMonth = () => setCalMonth(p => p.month === 11 ? { year: p.year+1, month: 0 } : { year: p.year, month: p.month+1 });
+  const canBackView = () => calViewMonth.year > now.getFullYear() || calViewMonth.month > now.getMonth();
+  const canFwdView = () => calViewMonth.year < maxYear || (calViewMonth.year === maxYear && calViewMonth.month < now.getMonth());
+  const prevMonthView = () => setCalViewMonth(p => p.month === 0 ? { year: p.year-1, month: 11 } : { year: p.year, month: p.month-1 });
+  const nextMonthView = () => setCalViewMonth(p => p.month === 11 ? { year: p.year+1, month: 0 } : { year: p.year, month: p.month+1 });
 
   const upcoming = useMemo(() => [...bookings].filter(b => b.end >= today).sort((a,b) => a.start.localeCompare(b.start)), [bookings, today]);
   const room = ROOMS.find(r => r.id === activeRoom);
@@ -160,16 +166,20 @@ export default function App() {
             <div
               key={ds}
               onClick={() => !readonly && !isPast && handleDayClick(roomId, ds)}
+              onTouchStart={() => !readonly && !isPast && setHoveredDay(ds)}
+              onTouchEnd={(e) => { if (!readonly && !isPast) { e.preventDefault(); handleDayClick(roomId, ds); setHoveredDay(null); } }}
               onMouseEnter={() => !readonly && setHoveredDay(ds)}
               onMouseLeave={() => !readonly && setHoveredDay(null)}
               title={booking ? booking.name + (booking.guest2 ? " + " + booking.guest2 : "") : ""}
               style={{
-                textAlign:"center", padding:"6px 2px", borderRadius:7,
+                textAlign:"center", padding:"8px 2px", borderRadius:7,
                 fontSize:"0.82rem", fontWeight: isToday ? 800 : 400,
                 background: bg, color: color,
                 cursor: readonly || isPast ? "default" : "pointer",
                 border: isToday ? "2px solid " + r.accent : "2px solid transparent",
-                userSelect:"none", transition:"all 0.1s"
+                userSelect:"none", transition:"all 0.1s",
+                WebkitTapHighlightColor:"transparent",
+                minHeight:36
               }}
             >
               {new Date(parseDate(ds)).getDate()}
@@ -199,7 +209,7 @@ export default function App() {
             <input
               value={pinInput}
               onChange={e => setPinInput(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && (pinInput === PIN ? (setUnlocked(true), setPinError("")) : (setPinError("Incorrect PIN."), setPinInput("")))}
+              onKeyDown={e => e.key === "Enter" && (pinInput === PIN ? (setUnlocked(true), sessionStorage.setItem("moosehill-unlocked","1"), setPinError("")) : (setPinError("Incorrect PIN."), setPinInput("")))}
               type="password"
               placeholder="Enter PIN"
               autoFocus
@@ -207,7 +217,7 @@ export default function App() {
             />
             {pinError && <div style={{ color:"#E07070", fontSize:"0.8rem", marginBottom:10 }}>{pinError}</div>}
             <button
-              onClick={() => pinInput === PIN ? (setUnlocked(true), setPinError("")) : (setPinError("Incorrect PIN."), setPinInput(""))}
+              onClick={() => pinInput === PIN ? (setUnlocked(true), sessionStorage.setItem("moosehill-unlocked","1"), setPinError("")) : (setPinError("Incorrect PIN."), setPinInput(""))}
               style={{ width:"100%", padding:"13px", background:"#C4A882", color:"#1C1510", border:"none", borderRadius:10, fontFamily:"'Lora', serif", fontSize:"0.95rem", fontWeight:700, cursor:"pointer" }}
             >
               Enter
@@ -237,6 +247,9 @@ export default function App() {
           .mobile-btn { display: none !important; }
           .mobile-nav { display: none !important; }
         }
+        button { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        a { -webkit-tap-highlight-color: transparent; }
+        input { font-size: 16px !important; }
       `}</style>
 
       {/* NAV */}
@@ -330,15 +343,15 @@ export default function App() {
 
           {/* Month nav */}
           <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"1.2rem" }}>
-            <button onClick={() => canBack() && prevMonth()} disabled={!canBack()}
-              style={{ background:"none", border:"1px solid #DDD", borderRadius:7, width:36, height:36, cursor:canBack()?"pointer":"not-allowed", opacity:canBack()?1:0.3, fontSize:"1.2rem", color:C.muted }}>
+            <button onClick={() => canBackView() && prevMonthView()} disabled={!canBackView()}
+              style={{ background:"none", border:"1px solid #DDD", borderRadius:7, width:36, height:36, cursor:canBackView()?"pointer":"not-allowed", opacity:canBackView()?1:0.3, fontSize:"1.2rem", color:C.muted }}>
               &lsaquo;
             </button>
             <span style={{ fontFamily:"'Playfair Display', serif", fontSize:"1.3rem", fontWeight:700, color:C.brown }}>
-              {MONTH_NAMES[calMonth.month]} {calMonth.year}
+              {MONTH_NAMES[calViewMonth.month]} {calViewMonth.year}
             </span>
-            <button onClick={() => canFwd() && nextMonth()} disabled={!canFwd()}
-              style={{ background:"none", border:"1px solid #DDD", borderRadius:7, width:36, height:36, cursor:canFwd()?"pointer":"not-allowed", opacity:canFwd()?1:0.3, fontSize:"1.2rem", color:C.muted }}>
+            <button onClick={() => canFwdView() && nextMonthView()} disabled={!canFwdView()}
+              style={{ background:"none", border:"1px solid #DDD", borderRadius:7, width:36, height:36, cursor:canFwdView()?"pointer":"not-allowed", opacity:canFwdView()?1:0.3, fontSize:"1.2rem", color:C.muted }}>
               &rsaquo;
             </button>
           </div>
@@ -353,7 +366,7 @@ export default function App() {
             </div>
             {/* Day cells */}
             {(() => {
-              const { year, month } = calMonth;
+              const { year, month } = calViewMonth;
               const firstDay = new Date(year, month, 1).getDay();
               const daysInMonth = new Date(year, month+1, 0).getDate();
               const cells = [];
@@ -380,7 +393,8 @@ export default function App() {
                         minHeight:64, borderRadius:8, padding:"6px 4px 4px",
                         background: isToday ? "#FDF5E8" : isPast ? "#F9F6F2" : "#fff",
                         border: isToday ? "2px solid "+C.tan : "1px solid #EAE4DA",
-                        display:"flex", flexDirection:"column", gap:2
+                        display:"flex", flexDirection:"column", gap:2,
+                        WebkitTapHighlightColor:"transparent"
                       }}>
                         <div style={{ fontSize:"0.8rem", fontWeight: isToday ? 800 : 400, color: isPast ? "#bbb" : C.brown, textAlign:"right", paddingRight:2, marginBottom:2 }}>
                           {new Date(parseDate(ds)).getDate()}
@@ -526,16 +540,6 @@ export default function App() {
               </div>
             </div>
             <div style={{ display:"flex", flexDirection:"column", gap:"1rem" }}>
-              <div style={{ background:C.cream, borderRadius:14, boxShadow:"0 2px 16px rgba(0,0,0,0.07)", padding:"1.2rem", borderTop:"4px solid "+room.accent }}>
-                <div style={{ fontFamily:"'Playfair Display', serif", fontSize:"1rem", fontWeight:700, color:C.brown, marginBottom:4 }}>How to Book</div>
-                <ol style={{ paddingLeft:18, fontSize:"0.8rem", color:"#5A4A3A", lineHeight:1.8 }}>
-                  <li>Pick a room tab</li>
-                  <li>Click check-in date</li>
-                  <li>Click check-out date</li>
-                  <li>Enter your name</li>
-                  <li>Confirm!</li>
-                </ol>
-              </div>
               <div style={{ background:C.cream, borderRadius:14, boxShadow:"0 2px 16px rgba(0,0,0,0.07)", padding:"1.2rem" }}>
                 <div style={{ fontFamily:"'Playfair Display', serif", fontSize:"1rem", fontWeight:700, color:C.brown, marginBottom:12 }}>Upcoming Stays</div>
                 {upcoming.length === 0 ? (
@@ -555,6 +559,16 @@ export default function App() {
                     </div>
                   );
                 })}
+              </div>
+              <div style={{ background:C.cream, borderRadius:14, boxShadow:"0 2px 16px rgba(0,0,0,0.07)", padding:"1.2rem", borderTop:"4px solid "+room.accent }}>
+                <div style={{ fontFamily:"'Playfair Display', serif", fontSize:"1rem", fontWeight:700, color:C.brown, marginBottom:4 }}>How to Book</div>
+                <ol style={{ paddingLeft:18, fontSize:"0.8rem", color:"#5A4A3A", lineHeight:1.8 }}>
+                  <li>Pick a room tab</li>
+                  <li>Click check-in date</li>
+                  <li>Click check-out date</li>
+                  <li>Enter your name</li>
+                  <li>Confirm!</li>
+                </ol>
               </div>
             </div>
           </div>
