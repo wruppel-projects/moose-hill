@@ -8,7 +8,7 @@ const IMG_MAP = "/map.jpg";
 
 const PIN = "1921";
 const ROOMS = [
-  { id: "st-bernard", name: "St. Bernard Room", location: "Downstairs",    color: "#5C4A32", accent: "#A07850", img: IMG_STBERNARD, emoji: "🐾", desc: "Ground-floor retreat with wide windows overlooking the snow-draped woods." },
+  { id: "st-bernard", name: "St. Bernard's Room", location: "Downstairs",    color: "#5C4A32", accent: "#A07850", img: IMG_STBERNARD, emoji: "🐾", desc: "Ground-floor retreat with wide windows overlooking the snow-draped woods." },
   { id: "taft",       name: "Taft Room",        location: "Upstairs West",  color: "#3B5E4E", accent: "#5A9478", img: IMG_TAFT,      emoji: "🌲", desc: "Vaulted upstairs sanctuary with treetop views to the west." },
   { id: "hamilton",   name: "Hamilton Room",    location: "Upstairs East",  color: "#3A4A6B", accent: "#6B8CBF", img: IMG_HAMILTON,  emoji: "🌄", desc: "Bright east-facing room with a classic iron bed and morning light." },
 ];
@@ -213,6 +213,7 @@ export default function App() {
       <div style={{ minHeight:"100vh", background:"#1C1510", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"Georgia, serif", padding:"2rem" }}>
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:wght@400;500;600&display=swap" rel="stylesheet" />
         <div style={{ textAlign:"center", maxWidth:400, width:"100%" }}>
+          <div style={{ width:"100%", height:220, borderRadius:16, overflow:"hidden", marginBottom:24, boxShadow:"0 8px 40px rgba(0,0,0,0.4)" }}><img src="/HomepageImage.jpg" alt="104 Moose Hill Road" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center" }} /></div>
           <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"2rem", fontWeight:900, color:"#F5EFE4", marginBottom:4 }}>104 Moose Hill Road</h1>
           <p style={{ fontFamily:"'Playfair Display', serif", fontStyle:"italic", color:"#C4A882", marginBottom:36, fontSize:"0.95rem" }}>Oxford, Connecticut</p>
           <div style={{ background:"#2C1F14", borderRadius:16, padding:"2rem", boxShadow:"0 8px 40px rgba(0,0,0,0.4)" }}>
