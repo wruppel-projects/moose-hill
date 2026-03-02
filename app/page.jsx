@@ -207,6 +207,8 @@ export default function App() {
 
   const navItems = [
     { id:"home", label:"Home" },
+    { id:"wifi", label:"WiFi & Codes" },
+    { id:"oxford", label:"Oxford, CT" },
     { id:"calendar", label:"Calendar" },
     { id:"reserve", label:"Reserve" },
     { id:"places", label:"Nearby Places" },
@@ -278,7 +280,7 @@ export default function App() {
           </button>
           <div className="desktop-nav" style={{ display:"flex", gap:4 }}>
             {navItems.map(n => (
-              <button key={n.id} className="nav-btn" onClick={() => nav(n.id)}
+              <button key={n.id} className="nav-btn" onClick={() => n.id === "oxford" ? window.open("/Oxford.pdf", "_blank") : nav(n.id)}
                 style={{ background:"none", border:"none", cursor:"pointer", padding:"8px 14px", fontFamily:"'Lora', serif", fontSize:"0.85rem", color: page===n.id ? "#C4A882" : "#C4B49A", fontWeight: page===n.id ? 600 : 400, borderBottom: page===n.id ? "2px solid #C4A882" : "2px solid transparent", transition:"all 0.15s" }}>
                 {n.label}
               </button>
@@ -292,7 +294,7 @@ export default function App() {
         {mobileMenuOpen && (
           <div className="mobile-nav" style={{ background:"#1C1510", borderTop:"1px solid #3D2B1F" }}>
             {navItems.map(n => (
-              <button key={n.id} onClick={() => nav(n.id)}
+              <button key={n.id} onClick={() => n.id === "oxford" ? window.open("/Oxford.pdf", "_blank") : nav(n.id)}
                 style={{ display:"block", width:"100%", textAlign:"left", padding:"12px 1.5rem", background:"none", border:"none", cursor:"pointer", fontFamily:"'Lora', serif", fontSize:"0.95rem", color: page===n.id ? "#C4A882" : "#C4B49A" }}>
                 {n.label}
               </button>
@@ -320,7 +322,7 @@ export default function App() {
               <p style={{ fontFamily:"'Playfair Display', serif", fontStyle:"italic", fontSize:"clamp(1rem,2.5vw,1.4rem)", color:C.tan, marginBottom:40 }}>
                 Oxford, Connecticut
               </p>
-              <div style={{ display:"flex", gap:16, justifyContent:"center", flexWrap:"wrap" }}>
+              <div style={{ display:"flex", gap:16, justifyContent:"center", flexWrap:"wrap", marginBottom:16 }}>
                 <button onClick={() => nav("reserve")}
                   style={{ padding:"15px 36px", background:C.tan, color:C.dark, border:"none", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"1rem", fontWeight:600, cursor:"pointer" }}>
                   Reserve a Room
@@ -329,12 +331,22 @@ export default function App() {
                   style={{ padding:"15px 36px", background:"transparent", color:"#F5EFE4", border:"1.5px solid #5C4A32", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"1rem", cursor:"pointer" }}>
                   See Calendar
                 </button>
+              </div>
+              <div style={{ display:"flex", gap:10, justifyContent:"center", flexWrap:"wrap" }}>
+                <button onClick={() => nav("wifi")}
+                  style={{ padding:"9px 20px", background:"transparent", color:"#8A7A6A", border:"1px solid #3D2B1F", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"0.82rem", cursor:"pointer" }}>
+                  WiFi & Codes
+                </button>
+                <button onClick={() => window.open("/Oxford.pdf", "_blank")}
+                  style={{ padding:"9px 20px", background:"transparent", color:"#8A7A6A", border:"1px solid #3D2B1F", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"0.82rem", cursor:"pointer" }}>
+                  Oxford, CT
+                </button>
                 <button onClick={() => nav("places")}
-                  style={{ padding:"15px 36px", background:"transparent", color:"#F5EFE4", border:"1.5px solid #5C4A32", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"1rem", cursor:"pointer" }}>
+                  style={{ padding:"9px 20px", background:"transparent", color:"#8A7A6A", border:"1px solid #3D2B1F", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"0.82rem", cursor:"pointer" }}>
                   Explore Nearby
                 </button>
                 <button onClick={() => nav("appliances")}
-                  style={{ padding:"15px 36px", background:"transparent", color:"#F5EFE4", border:"1.5px solid #5C4A32", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"1rem", cursor:"pointer" }}>
+                  style={{ padding:"9px 20px", background:"transparent", color:"#8A7A6A", border:"1px solid #3D2B1F", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"0.82rem", cursor:"pointer" }}>
                   Appliances
                 </button>
               </div>
@@ -642,6 +654,34 @@ export default function App() {
         </div>
       )}
 
+      {/* WIFI PAGE */}
+      {page === "wifi" && (
+        <div style={{ maxWidth:600, margin:"0 auto", padding:"2.5rem 1.5rem" }}>
+          <div style={{ marginBottom:"2rem" }}>
+            <div style={{ fontSize:"0.7rem", letterSpacing:"0.2em", textTransform:"uppercase", color:C.muted, marginBottom:8, fontWeight:700 }}>Access</div>
+            <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"clamp(1.8rem,4vw,2.6rem)", fontWeight:700, color:C.brown }}>WiFi & Codes</h1>
+          </div>
+          <div style={{ display:"flex", flexDirection:"column", gap:"1rem" }}>
+            <div style={{ background:C.cream, borderRadius:14, boxShadow:"0 2px 16px rgba(0,0,0,0.07)", padding:"1.4rem 1.6rem", borderLeft:"4px solid "+C.tan }}>
+              <div style={{ fontSize:"0.7rem", letterSpacing:"0.15em", textTransform:"uppercase", color:C.muted, fontWeight:700, marginBottom:8 }}>WiFi Network</div>
+              <div style={{ fontFamily:"'Playfair Display', serif", fontSize:"1.4rem", fontWeight:700, color:C.brown }}>Oxferd</div>
+            </div>
+            <div style={{ background:C.cream, borderRadius:14, boxShadow:"0 2px 16px rgba(0,0,0,0.07)", padding:"1.4rem 1.6rem", borderLeft:"4px solid "+C.tan }}>
+              <div style={{ fontSize:"0.7rem", letterSpacing:"0.15em", textTransform:"uppercase", color:C.muted, fontWeight:700, marginBottom:8 }}>WiFi Password</div>
+              <div style={{ fontFamily:"'Playfair Display', serif", fontSize:"1.4rem", fontWeight:700, color:C.brown, letterSpacing:"0.05em" }}>Zarden1921+</div>
+            </div>
+            <div style={{ background:C.cream, borderRadius:14, boxShadow:"0 2px 16px rgba(0,0,0,0.07)", padding:"1.4rem 1.6rem", borderLeft:"4px solid "+C.tan }}>
+              <div style={{ fontSize:"0.7rem", letterSpacing:"0.15em", textTransform:"uppercase", color:C.muted, fontWeight:700, marginBottom:8 }}>Door Key</div>
+              <div style={{ fontSize:"1rem", color:C.brown, lineHeight:1.6 }}>Your key will work on the front and back doors.</div>
+            </div>
+            <div style={{ background:C.cream, borderRadius:14, boxShadow:"0 2px 16px rgba(0,0,0,0.07)", padding:"1.4rem 1.6rem", borderLeft:"4px solid "+C.tan }}>
+              <div style={{ fontSize:"0.7rem", letterSpacing:"0.15em", textTransform:"uppercase", color:C.muted, fontWeight:700, marginBottom:8 }}>Garage Door Code</div>
+              <div style={{ fontFamily:"'Playfair Display', serif", fontSize:"1.4rem", fontWeight:700, color:C.brown, letterSpacing:"0.1em" }}>1921 [Enter]</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* APPLIANCES PAGE */}
       {page === "appliances" && (
         <div style={{ maxWidth:700, margin:"0 auto", padding:"2.5rem 1.5rem" }}>
@@ -679,7 +719,7 @@ export default function App() {
         <div style={{ fontSize:"0.75rem", color:C.muted }}>Oxford, Connecticut</div>
         <div style={{ display:"flex", justifyContent:"center", gap:24, marginTop:16 }}>
           {navItems.map(n => (
-            <button key={n.id} onClick={() => nav(n.id)}
+            <button key={n.id} onClick={() => n.id === "oxford" ? window.open("/Oxford.pdf", "_blank") : nav(n.id)}
               style={{ background:"none", border:"none", cursor:"pointer", color:C.muted, fontSize:"0.78rem", fontFamily:"'Lora', serif" }}>
               {n.label}
             </button>
