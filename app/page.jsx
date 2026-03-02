@@ -69,6 +69,7 @@ export default function App() {
 
   useEffect(() => {
     try { if (sessionStorage.getItem("moosehill-unlocked") === "1") setUnlocked(true); } catch {}
+    try { const p = sessionStorage.getItem("moosehill-page"); if (p) setPage(p); } catch {}
     fetch("/api/bookings")
       .then(r => r.json())
       .then(data => { if (Array.isArray(data)) setBookings(data); })
@@ -86,7 +87,7 @@ export default function App() {
     } catch {}
   }
 
-  const nav = (p) => { setPage(p); setMobileMenuOpen(false); window.scrollTo(0,0); };
+  const nav = (p) => { setPage(p); setMobileMenuOpen(false); window.scrollTo(0,0); try { sessionStorage.setItem("moosehill-page", p); } catch {} };
 
   const getBooking = (roomId, ds) => bookings.find(b => b.roomId === roomId && getDates(parseDate(b.start), parseDate(b.end)).includes(ds));
 
@@ -106,7 +107,8 @@ export default function App() {
 
   function handleDayClick(roomId, ds) {
     if (ds < today) return;
-    if (!sel.selecting || !sel.start) {
+    // If no selection started, or a complete selection already exists, start fresh
+    if (!sel.selecting || !sel.start || (sel.start && sel.end)) {
       setSel({ start: ds, end: null, selecting: true });
     } else {
       let [start, end] = [sel.start, ds];
@@ -219,7 +221,7 @@ export default function App() {
               value={pinInput}
               onChange={e => setPinInput(e.target.value)}
               onKeyDown={e => e.key === "Enter" && (pinInput === PIN ? (setUnlocked(true), sessionStorage.setItem("moosehill-unlocked","1"), setPinError("")) : (setPinError("Incorrect PIN."), setPinInput("")))}
-              type="password"
+              type="password" inputMode="numeric" pattern="[0-9]*"
               placeholder="Enter PIN"
               autoFocus
               style={{ width:"100%", padding:"14px 16px", background:"#1C1510", border:"1.5px solid #3D2B1F", borderRadius:10, fontFamily:"'Lora', serif", fontSize:"1.2rem", color:"#F5EFE4", textAlign:"center", letterSpacing:"0.3em", outline:"none", marginBottom:12, boxSizing:"border-box" }}
