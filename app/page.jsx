@@ -14,8 +14,12 @@ const ROOMS = [
 ];
 
 const PLACES = [
-  { category: "Essentials",         name: "Market 32",                  type: "Grocery Store", distance: "2.0 mi", drive: "6 min",  maps: "https://maps.google.com/?q=Market+32+Oxford+CT",                   hours: "Daily 6am-11pm" },
-  { category: "Essentials",         name: "Ace Hardware by Chatfield",  type: "Hardware Store", distance: "2.0 mi", drive: "6 min",  maps: "https://maps.google.com/?q=Ace+Hardware+Chatfield+Oxford+CT",      hours: "Mon-Fri 7:30am-6pm, Sat 7:30am-5pm, Sun 8am-4pm" },
+  { category: "Essentials and Stores",         name: "Market 32",                  type: "Grocery Store", distance: "2.0 mi", drive: "6 min",  maps: "https://maps.google.com/?q=Market+32+Oxford+CT",                   hours: "Daily 6am-11pm" },
+  { category: "Essentials and Stores",         name: "Dunkin",                     type: "Coffee & Donuts",          distance: "",    drive: "",       maps: "https://maps.apple/p/wUIuMh-VXZqTzL" },
+  { category: "Essentials and Stores",         name: "Fritz's Snack Bar",           type: "Snack Bar",                distance: "",    drive: "",       maps: "https://maps.apple/p/YdLNBI2MDU..oD" },
+  { category: "Essentials and Stores",         name: "Oxford Liquor Shoppe",         type: "Liquor Store",             distance: "",    drive: "",       maps: "https://maps.apple/p/tVF0u9tQy9SpTQ" },
+  { category: "Essentials and Stores",         name: "Starbucks",                    type: "Coffee",                   distance: "",    drive: "",       maps: "https://maps.apple/p/AcauFsD~Ibsfue" },
+  { category: "Essentials and Stores",         name: "Ace Hardware by Chatfield",  type: "Hardware Store", distance: "2.0 mi", drive: "6 min",  maps: "https://maps.google.com/?q=Ace+Hardware+Chatfield+Oxford+CT",      hours: "Mon-Fri 7:30am-6pm, Sat 7:30am-5pm, Sun 8am-4pm" },
   { category: "Parks & Trails",     name: "Southford Falls State Park", type: "Waterfall & Covered Bridge", distance: "3.0 mi", drive: "8 min",  maps: "https://maps.google.com/?q=Southford+Falls+State+Park+CT",        hours: "Open daily" },
   { category: "Parks & Trails",     name: "Jackson Cove Town Park",     type: "Lake Beach & Boat Launch", distance: "4.1 mi", drive: "10 min", maps: "https://maps.google.com/?q=Jackson+Cove+Town+Park+Oxford+CT",     hours: "Daily 7am-8pm" },
   { category: "Parks & Trails",     name: "Rockhouse Hill Sanctuary",   type: "Hiking & MTB Trails", distance: "5.8 mi", drive: "13 min", maps: "https://maps.google.com/?q=Rockhouse+Hill+Sanctuary+Oxford+CT",   hours: "Open daily" },
@@ -62,7 +66,7 @@ export default function App() {
   const [modalOpen, setModalOpen] = useState(false);
   const [cancelTarget, setCancelTarget] = useState(null);
   const [hoveredDay, setHoveredDay] = useState(null);
-  const [placesTab, setPlacesTab] = useState("Essentials");
+  const [placesTab, setPlacesTab] = useState("Essentials and Stores");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const today = formatDate(new Date());
@@ -206,6 +210,7 @@ export default function App() {
     { id:"calendar", label:"Calendar" },
     { id:"reserve", label:"Reserve" },
     { id:"places", label:"Nearby Places" },
+    { id:"appliances", label:"Appliances" },
   ];
 
   if (!unlocked) {
@@ -213,7 +218,7 @@ export default function App() {
       <div style={{ minHeight:"100vh", background:"#1C1510", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"Georgia, serif", padding:"2rem" }}>
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:wght@400;500;600&display=swap" rel="stylesheet" />
         <div style={{ textAlign:"center", maxWidth:400, width:"100%" }}>
-          <div style={{ width:"100%", height:220, borderRadius:16, overflow:"hidden", marginBottom:24, boxShadow:"0 8px 40px rgba(0,0,0,0.4)" }}><img src="/HomepageImage.jpg" alt="104 Moose Hill Road" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center" }} /></div>
+          <div style={{ width:"100%", height:220, borderRadius:16, overflow:"hidden", marginBottom:24, boxShadow:"0 8px 40px rgba(0,0,0,0.4)" }}><img src="/HomepageImage.jpeg" alt="104 Moose Hill Road" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"top" }} /></div>
           <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"2rem", fontWeight:900, color:"#F5EFE4", marginBottom:4 }}>104 Moose Hill Road</h1>
           <p style={{ fontFamily:"'Playfair Display', serif", fontStyle:"italic", color:"#C4A882", marginBottom:36, fontSize:"0.95rem" }}>Oxford, Connecticut</p>
           <div style={{ background:"#2C1F14", borderRadius:16, padding:"2rem", boxShadow:"0 8px 40px rgba(0,0,0,0.4)" }}>
@@ -327,6 +332,10 @@ export default function App() {
                 <button onClick={() => nav("places")}
                   style={{ padding:"15px 36px", background:"transparent", color:"#F5EFE4", border:"1.5px solid #5C4A32", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"1rem", cursor:"pointer" }}>
                   Explore Nearby
+                </button>
+                <button onClick={() => nav("appliances")}
+                  style={{ padding:"15px 36px", background:"transparent", color:"#F5EFE4", border:"1.5px solid #5C4A32", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"1rem", cursor:"pointer" }}>
+                  Appliances
                 </button>
               </div>
             </div>
@@ -596,7 +605,7 @@ export default function App() {
             <p style={{ color:C.muted, marginTop:6, fontSize:"0.9rem" }}>All distances from 104 Moose Hill Road.</p>
           </div>
           <div style={{ display:"flex", gap:8, marginBottom:"1.5rem", flexWrap:"wrap" }}>
-            {["Essentials","Parks & Trails"].map(cat => (
+            {["Essentials and Stores","Parks & Trails"].map(cat => (
               <button key={cat} onClick={() => setPlacesTab(cat)}
                 style={{ padding:"9px 20px", border:"none", borderRadius:24, fontFamily:"'Lora', serif", fontSize:"0.85rem", cursor:"pointer", background: placesTab===cat ? C.brown : "#EAE4DA", color: placesTab===cat ? "#F5EFE4" : C.muted, fontWeight: placesTab===cat ? 600 : 400 }}>
                 {cat}
@@ -629,6 +638,37 @@ export default function App() {
           </div>
           <div style={{ marginTop:"1rem", fontSize:"0.75rem", color:"#BBB", textAlign:"center", fontStyle:"italic" }}>
             Drive times are approximate. Ratings from Google Maps.
+          </div>
+        </div>
+      )}
+
+      {/* APPLIANCES PAGE */}
+      {page === "appliances" && (
+        <div style={{ maxWidth:700, margin:"0 auto", padding:"2.5rem 1.5rem" }}>
+          <div style={{ marginBottom:"2rem" }}>
+            <div style={{ fontSize:"0.7rem", letterSpacing:"0.2em", textTransform:"uppercase", color:C.muted, marginBottom:8, fontWeight:700 }}>Reference</div>
+            <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"clamp(1.8rem,4vw,2.6rem)", fontWeight:700, color:C.brown }}>Appliance User Manuals</h1>
+            <p style={{ color:"#5A4A3A", marginTop:6, fontSize:"0.9rem" }}>Links open the manufacturer's manual in a new tab.</p>
+          </div>
+          <div style={{ background:C.cream, borderRadius:16, boxShadow:"0 2px 20px rgba(0,0,0,0.07)", overflow:"hidden" }}>
+            {[
+              { name:"HVAC",         icon:"❄️",  url:"https://iaq.na.panasonic.com/hubfs/PCI%20-%20Panasonic%20North%20America%20Canada/IAQ/HVAC%20Resources/Operating-Manual_CS-XZ_CS-MXZ_CU-XZ_CU-xZxxABUC_CU-xZxxBBUC_English_Nov_2025_Bill29.pdf?hsLang=en" },
+              { name:"Dryer",        icon:"🌀",  url:"https://www.whirlpool.com/results.html?term=wed5010&tab=clp&plp=WED5010LW%253Arelevance&plpView=grid&clp=wed5010%253Adoc_type%253Aowners-manual&currentPage=0" },
+              { name:"Washer",       icon:"🫧",  url:"https://www.whirlpool.com/content/dam/global/documents/202305/owners-manual-w11654314-revB.pdf" },
+              { name:"Stove",        icon:"🔥",  url:"https://www.whirlpool.com/content/dam/global/documents/202409/owners-manual-w11640308-revc.pdf" },
+              { name:"Refrigerator", icon:"🧊",  url:"https://www.whirlpool.com/content/dam/global/documents/202406/owners-manual-w11727207-revA.pdf" },
+              { name:"Microwave",    icon:"📡",  url:"https://www.whirlpool.com/content/dam/global/documents/201809/use-and-care-w11247855-revA.pdf" },
+              { name:"Dishwasher",   icon:"🍽️", url:"https://www.whirlpool.com/content/dam/global/documents/202304/owners-manual-w11532445-revD.pdf" },
+            ].map((item, i, arr) => (
+              <a key={item.name} href={item.url} target="_blank" rel="noopener noreferrer"
+                style={{ display:"flex", alignItems:"center", gap:16, padding:"16px 20px", borderBottom: i < arr.length-1 ? "1px solid #EAE4DA" : "none", textDecoration:"none", background: i%2===0 ? "#fff" : C.cream, transition:"background 0.15s" }}
+                onMouseEnter={e => e.currentTarget.style.background="#F0EBE3"}
+                onMouseLeave={e => e.currentTarget.style.background= i%2===0 ? "#fff" : C.cream}>
+                <span style={{ fontSize:"1.5rem", width:32, textAlign:"center" }}>{item.icon}</span>
+                <span style={{ fontFamily:"'Playfair Display', serif", fontSize:"1rem", fontWeight:600, color:C.brown, flex:1 }}>{item.name}</span>
+                <span style={{ fontSize:"0.8rem", color:C.tan, fontWeight:600 }}>View Manual &#8599;</span>
+              </a>
+            ))}
           </div>
         </div>
       )}
