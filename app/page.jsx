@@ -15,10 +15,10 @@ const ROOMS = [
 
 const PLACES = [
   { category: "Essentials and Stores",         name: "Market 32",                  type: "Grocery Store", distance: "2.0 mi", drive: "6 min",  maps: "https://maps.google.com/?q=Market+32+Oxford+CT",                   hours: "Daily 6am-11pm" },
-  { category: "Essentials and Stores",         name: "Dunkin",                     type: "Coffee & Donuts",          distance: "",    drive: "",       maps: "https://maps.apple/p/wUIuMh-VXZqTzL" },
-  { category: "Essentials and Stores",         name: "Fritz's Snack Bar",           type: "Snack Bar",                distance: "",    drive: "",       maps: "https://maps.apple/p/YdLNBI2MDU..oD" },
-  { category: "Essentials and Stores",         name: "Oxford Liquor Shoppe",         type: "Liquor Store",             distance: "",    drive: "",       maps: "https://maps.apple/p/tVF0u9tQy9SpTQ" },
-  { category: "Essentials and Stores",         name: "Starbucks",                    type: "Coffee",                   distance: "",    drive: "",       maps: "https://maps.apple/p/AcauFsD~Ibsfue" },
+  { category: "Essentials and Stores", name: "Dunkin",               type: "Coffee & Donuts", distance: "", drive: "", maps: "https://maps.apple/p/wUIuMh-VXZqTzL" },
+  { category: "Essentials and Stores", name: "Fritz's Snack Bar",     type: "Snack Bar",        distance: "", drive: "", maps: "https://maps.apple/p/YdLNBI2MDU..oD" },
+  { category: "Essentials and Stores", name: "Oxford Liquor Shoppe",   type: "Liquor Store",     distance: "", drive: "", maps: "https://maps.apple/p/tVF0u9tQy9SpTQ" },
+  { category: "Essentials and Stores", name: "Starbucks",              type: "Coffee",           distance: "", drive: "", maps: "https://maps.apple/p/AcauFsD~Ibsfue" },
   { category: "Essentials and Stores",         name: "Ace Hardware by Chatfield",  type: "Hardware Store", distance: "2.0 mi", drive: "6 min",  maps: "https://maps.google.com/?q=Ace+Hardware+Chatfield+Oxford+CT",      hours: "Mon-Fri 7:30am-6pm, Sat 7:30am-5pm, Sun 8am-4pm" },
   { category: "Parks & Trails",     name: "Southford Falls State Park", type: "Waterfall & Covered Bridge", distance: "3.0 mi", drive: "8 min",  maps: "https://maps.google.com/?q=Southford+Falls+State+Park+CT",        hours: "Open daily" },
   { category: "Parks & Trails",     name: "Jackson Cove Town Park",     type: "Lake Beach & Boat Launch", distance: "4.1 mi", drive: "10 min", maps: "https://maps.google.com/?q=Jackson+Cove+Town+Park+Oxford+CT",     hours: "Daily 7am-8pm" },
@@ -218,7 +218,7 @@ export default function App() {
       <div style={{ minHeight:"100vh", background:"#1C1510", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"Georgia, serif", padding:"2rem" }}>
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:wght@400;500;600&display=swap" rel="stylesheet" />
         <div style={{ textAlign:"center", maxWidth:400, width:"100%" }}>
-          <div style={{ width:"100%", height:220, borderRadius:16, overflow:"hidden", marginBottom:24, boxShadow:"0 8px 40px rgba(0,0,0,0.4)" }}><img src="/HomepageImage.jpeg" alt="104 Moose Hill Road" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"top" }} /></div>
+          <div style={{ width:"100%", height:220, borderRadius:16, overflow:"hidden", marginBottom:24, boxShadow:"0 8px 40px rgba(0,0,0,0.4)" }}><img src="/HomepageImage.jpeg" alt="104 Moose Hill Road" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 30%" }} /></div>
           <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"2rem", fontWeight:900, color:"#F5EFE4", marginBottom:4 }}>104 Moose Hill Road</h1>
           <p style={{ fontFamily:"'Playfair Display', serif", fontStyle:"italic", color:"#C4A882", marginBottom:36, fontSize:"0.95rem" }}>Oxford, Connecticut</p>
           <div style={{ background:"#2C1F14", borderRadius:16, padding:"2rem", boxShadow:"0 8px 40px rgba(0,0,0,0.4)" }}>
@@ -648,7 +648,7 @@ export default function App() {
           <div style={{ marginBottom:"2rem" }}>
             <div style={{ fontSize:"0.7rem", letterSpacing:"0.2em", textTransform:"uppercase", color:C.muted, marginBottom:8, fontWeight:700 }}>Reference</div>
             <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"clamp(1.8rem,4vw,2.6rem)", fontWeight:700, color:C.brown }}>Appliance User Manuals</h1>
-            <p style={{ color:"#5A4A3A", marginTop:6, fontSize:"0.9rem" }}>Links open the manufacturer's manual in a new tab.</p>
+            <p style={{ color:"#5A4A3A", marginTop:6, fontSize:"0.9rem" }}>Links open the manufacturer manual in a new tab.</p>
           </div>
           <div style={{ background:C.cream, borderRadius:16, boxShadow:"0 2px 20px rgba(0,0,0,0.07)", overflow:"hidden" }}>
             {[
@@ -661,7 +661,7 @@ export default function App() {
               { name:"Dishwasher",   icon:"🍽️", url:"https://www.whirlpool.com/content/dam/global/documents/202304/owners-manual-w11532445-revD.pdf" },
             ].map((item, i, arr) => (
               <a key={item.name} href={item.url} target="_blank" rel="noopener noreferrer"
-                style={{ display:"flex", alignItems:"center", gap:16, padding:"16px 20px", borderBottom: i < arr.length-1 ? "1px solid #EAE4DA" : "none", textDecoration:"none", background: i%2===0 ? "#fff" : C.cream, transition:"background 0.15s" }}
+                style={{ display:"flex", alignItems:"center", gap:16, padding:"16px 20px", borderBottom: i < arr.length-1 ? "1px solid #EAE4DA" : "none", textDecoration:"none", background: i%2===0 ? "#fff" : C.cream }}
                 onMouseEnter={e => e.currentTarget.style.background="#F0EBE3"}
                 onMouseLeave={e => e.currentTarget.style.background= i%2===0 ? "#fff" : C.cream}>
                 <span style={{ fontSize:"1.5rem", width:32, textAlign:"center" }}>{item.icon}</span>
