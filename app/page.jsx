@@ -7,8 +7,6 @@ const IMG_STBERNARD = "/stbernard.jpg";
 const IMG_MAP = "/map.jpg";
 
 const PIN = "1921";
-const STORAGE_KEY = "moosehill-bookings-v2";
-
 const ROOMS = [
   { id: "st-bernard", name: "St. Bernard Room", location: "Downstairs",    color: "#5C4A32", accent: "#A07850", img: IMG_STBERNARD, emoji: "🐾", desc: "Ground-floor retreat with wide windows overlooking the snow-draped woods." },
   { id: "taft",       name: "Taft Room",        location: "Upstairs West",  color: "#3B5E4E", accent: "#5A9478", img: IMG_TAFT,      emoji: "🌲", desc: "Vaulted upstairs sanctuary with treetop views to the west." },
@@ -70,12 +68,23 @@ export default function App() {
   const today = formatDate(new Date());
 
   useEffect(() => {
-    try { const s = localStorage.getItem(STORAGE_KEY); if (s) setBookings(JSON.parse(s)); } catch {}
     try { if (sessionStorage.getItem("moosehill-unlocked") === "1") setUnlocked(true); } catch {}
+    fetch("/api/bookings")
+      .then(r => r.json())
+      .then(data => { if (Array.isArray(data)) setBookings(data); })
+      .catch(() => {});
   }, []);
-  useEffect(() => {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings)); } catch {}
-  }, [bookings]);
+
+  async function saveBookings(updated) {
+    setBookings(updated);
+    try {
+      await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updated),
+      });
+    } catch {}
+  }
 
   const nav = (p) => { setPage(p); setMobileMenuOpen(false); window.scrollTo(0,0); };
 
@@ -113,14 +122,14 @@ export default function App() {
 
   function handleSubmit() {
     if (!form.name.trim()) { setFormError("Please enter your name."); return; }
-    setBookings(p => [...p, { id: Date.now().toString(), roomId: activeRoom, start: sel.start, end: sel.end || sel.start, name: form.name.trim(), guest2: form.guest2.trim() }]);
+    saveBookings([...bookings, { id: Date.now().toString(), roomId: activeRoom, start: sel.start, end: sel.end || sel.start, name: form.name.trim(), guest2: form.guest2.trim() }]);
     setModalOpen(false); setSel({ start:null, end:null, selecting:false });
     setSuccess("Booked! " + form.name + " - " + room.name);
     setTimeout(() => setSuccess(""), 5000);
   }
 
   function handleCancel() {
-    setBookings(p => p.filter(b => b.id !== cancelTarget.id));
+    saveBookings(bookings.filter(b => b.id !== cancelTarget.id));
     setCancelTarget(null);
     setSuccess("Booking cancelled."); setTimeout(() => setSuccess(""), 4000);
   }
