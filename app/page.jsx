@@ -15,10 +15,9 @@ const ROOMS = [
 
 const PLACES = [
   { category: "Essentials and Stores",         name: "Market 32",                  type: "Grocery Store", distance: "2.0 mi", drive: "6 min",  maps: "https://maps.google.com/?q=Market+32+Oxford+CT",                   hours: "Daily 6am-11pm" },
-  { category: "Essentials and Stores", name: "Dunkin",               type: "Coffee & Donuts", distance: "", drive: "", maps: "https://maps.apple/p/wUIuMh-VXZqTzL" },
-  { category: "Essentials and Stores", name: "Fritz's Snack Bar",     type: "Snack Bar",        distance: "", drive: "", maps: "https://maps.apple/p/YdLNBI2MDU..oD" },
-  { category: "Essentials and Stores", name: "Oxford Liquor Shoppe",   type: "Liquor Store",     distance: "", drive: "", maps: "https://maps.apple/p/tVF0u9tQy9SpTQ" },
-  { category: "Essentials and Stores", name: "Starbucks",              type: "Coffee",           distance: "", drive: "", maps: "https://maps.apple/p/AcauFsD~Ibsfue" },
+  { category: "Essentials and Stores", name: "Dunkin",             type: "Coffee & Donuts", distance: "1.9 mi", drive: "5 min", maps: "https://maps.apple/p/wUIuMh-VXZqTzL" },
+  { category: "Essentials and Stores", name: "Fritz's Snack Bar",   type: "Snack Bar",        distance: "2.0 mi", drive: "5 min", maps: "https://maps.apple/p/YdLNBI2MDU..oD" },
+  { category: "Essentials and Stores", name: "Oxford Liquor Shoppe", type: "Liquor Store",     distance: "2.2 mi", drive: "5 min", maps: "https://maps.apple/p/tVF0u9tQy9SpTQ" },
   { category: "Essentials and Stores",         name: "Ace Hardware by Chatfield",  type: "Hardware Store", distance: "2.0 mi", drive: "6 min",  maps: "https://maps.google.com/?q=Ace+Hardware+Chatfield+Oxford+CT",      hours: "Mon-Fri 7:30am-6pm, Sat 7:30am-5pm, Sun 8am-4pm" },
   { category: "Parks & Trails",     name: "Southford Falls State Park", type: "Waterfall & Covered Bridge", distance: "3.0 mi", drive: "8 min",  maps: "https://maps.google.com/?q=Southford+Falls+State+Park+CT",        hours: "Open daily" },
   { category: "Parks & Trails",     name: "Jackson Cove Town Park",     type: "Lake Beach & Boat Launch", distance: "4.1 mi", drive: "10 min", maps: "https://maps.google.com/?q=Jackson+Cove+Town+Park+Oxford+CT",     hours: "Daily 7am-8pm" },
