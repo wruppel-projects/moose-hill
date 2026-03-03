@@ -273,7 +273,7 @@ export default function App() {
         .room-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.14) !important; }
         .room-card { transition: transform 0.2s, box-shadow 0.2s; }
         .place-row:hover { background: #F0EBE3 !important; }
-        .nav-btn:hover { color: #C4A882 !important; }
+        .nav-btn:hover { color: #fff !important; }
         @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
         @media (max-width: 768px) {
           .desktop-nav { display: none !important; }
@@ -299,7 +299,7 @@ export default function App() {
           <div className="desktop-nav" style={{ display:"flex", gap:4, alignItems:"center" }}>
             {navGroups.map(g => g.single ? (
               <button key={g.id} className="nav-btn" onClick={() => handleNavClick(g.id)}
-                style={{ background:"none", border:"none", cursor:"pointer", padding:"8px 14px", fontFamily:"'Lora', serif", fontSize:"0.85rem", color: page===g.id ? "#C4A882" : "#C4B49A", fontWeight: page===g.id ? 600 : 400, borderBottom: page===g.id ? "2px solid #C4A882" : "2px solid transparent", transition:"all 0.15s" }}>
+                style={{ background:"none", border:"none", cursor:"pointer", padding:"8px 14px", fontFamily:"'Lora', serif", fontSize:"0.85rem", color: page===g.id ? "#C4A882" : "#F0EBE3", fontWeight: page===g.id ? 600 : 400, borderBottom: page===g.id ? "2px solid #C4A882" : "2px solid transparent", transition:"all 0.15s" }}>
                 {g.label}
               </button>
             ) : (
@@ -307,13 +307,13 @@ export default function App() {
                 onMouseEnter={e => e.currentTarget.querySelector(".nav-dropdown").style.display="block"}
                 onMouseLeave={e => e.currentTarget.querySelector(".nav-dropdown").style.display="none"}>
                 <button className="nav-btn"
-                  style={{ background:"none", border:"none", cursor:"pointer", padding:"8px 14px", fontFamily:"'Lora', serif", fontSize:"0.85rem", color: g.items.some(i => i.id===page) ? "#C4A882" : "#C4B49A", fontWeight: g.items.some(i => i.id===page) ? 600 : 400, borderBottom: g.items.some(i => i.id===page) ? "2px solid #C4A882" : "2px solid transparent", transition:"all 0.15s" }}>
+                  style={{ background:"none", border:"none", cursor:"pointer", padding:"8px 14px", fontFamily:"'Lora', serif", fontSize:"0.85rem", color: g.items.some(i => i.id===page) ? "#C4A882" : "#F0EBE3", fontWeight: g.items.some(i => i.id===page) ? 600 : 400, borderBottom: g.items.some(i => i.id===page) ? "2px solid #C4A882" : "2px solid transparent", transition:"all 0.15s" }}>
                   {g.label} ▾
                 </button>
                 <div className="nav-dropdown" style={{ display:"none", position:"absolute", top:"100%", left:0, background:"rgba(28,21,16,0.98)", borderRadius:8, boxShadow:"0 8px 32px rgba(0,0,0,0.4)", minWidth:160, zIndex:500, overflow:"hidden", border:"1px solid #3D2B1F" }}>
                   {g.items.map(item => (
                     <button key={item.id} onClick={() => handleNavClick(item.id)}
-                      style={{ display:"block", width:"100%", textAlign:"left", padding:"11px 18px", background:"none", border:"none", borderBottom:"1px solid #3D2B1F", cursor:"pointer", fontFamily:"'Lora', serif", fontSize:"0.85rem", color: page===item.id ? "#C4A882" : "#C4B49A" }}>
+                      style={{ display:"block", width:"100%", textAlign:"left", padding:"11px 18px", background:"none", border:"none", borderBottom:"1px solid #3D2B1F", cursor:"pointer", fontFamily:"'Lora', serif", fontSize:"0.85rem", color: page===item.id ? "#C4A882" : "#F0EBE3" }}>
                       {item.label}
                     </button>
                   ))}
@@ -322,7 +322,7 @@ export default function App() {
             ))}
           </div>
           <button className="mobile-btn" onClick={() => setMobileMenuOpen(v => !v)}
-            style={{ background:"none", border:"1px solid #3D2B1F", borderRadius:6, padding:"6px 10px", cursor:"pointer", color:"#C4B49A", fontSize:"1.2rem", display:"none" }}>
+            style={{ background:"none", border:"1px solid #3D2B1F", borderRadius:6, padding:"6px 10px", cursor:"pointer", color:"#F0EBE3", fontSize:"1.2rem", display:"none" }}>
             {mobileMenuOpen ? "X" : "="}
           </button>
         </div>
@@ -330,7 +330,7 @@ export default function App() {
           <div className="mobile-nav" style={{ background:"#1C1510", borderTop:"1px solid #3D2B1F" }}>
             {navGroups.map(g => g.single ? (
               <button key={g.id} onClick={() => handleNavClick(g.id)}
-                style={{ display:"block", width:"100%", textAlign:"left", padding:"12px 1.5rem", background:"none", border:"none", cursor:"pointer", fontFamily:"'Lora', serif", fontSize:"0.95rem", color: page===g.id ? "#C4A882" : "#C4B49A" }}>
+                style={{ display:"block", width:"100%", textAlign:"left", padding:"12px 1.5rem", background:"none", border:"none", cursor:"pointer", fontFamily:"'Lora', serif", fontSize:"0.95rem", color: page===g.id ? "#C4A882" : "#F0EBE3" }}>
                 {g.label}
               </button>
             ) : (
@@ -338,7 +338,7 @@ export default function App() {
                 <div style={{ padding:"10px 1.5rem 4px", fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"#5C4A32", fontFamily:"'Lora', serif" }}>{g.label}</div>
                 {g.items.map(item => (
                   <button key={item.id} onClick={() => handleNavClick(item.id)}
-                    style={{ display:"block", width:"100%", textAlign:"left", padding:"10px 1.5rem 10px 2.2rem", background:"none", border:"none", cursor:"pointer", fontFamily:"'Lora', serif", fontSize:"0.9rem", color: page===item.id ? "#C4A882" : "#C4B49A" }}>
+                    style={{ display:"block", width:"100%", textAlign:"left", padding:"10px 1.5rem 10px 2.2rem", background:"none", border:"none", cursor:"pointer", fontFamily:"'Lora', serif", fontSize:"0.9rem", color: page===item.id ? "#C4A882" : "#F0EBE3" }}>
                     {item.label}
                   </button>
                 ))}
@@ -361,10 +361,10 @@ export default function App() {
           <div style={{ background:"#F0EBE3", position:"relative", overflow:"hidden", minHeight:"85vh", display:"flex", alignItems:"center", justifyContent:"center" }}>
             <div style={{ position:"absolute", inset:0, opacity:0.06, background:"radial-gradient(circle, #3D2B1F 1px, transparent 1px)", backgroundSize:"24px 24px" }} />
             <div style={{ textAlign:"center", padding:"4rem 2rem", position:"relative", zIndex:1 }}>
-              <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"clamp(2.8rem,7vw,5.5rem)", fontWeight:900, color:"#3D2B1F", letterSpacing:"-0.02em", lineHeight:1, marginBottom:12 }}>
+              <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"clamp(1.8rem,4vw,3.2rem)", fontWeight:900, color:"#3D2B1F", letterSpacing:"-0.02em", lineHeight:1, marginBottom:12 }}>
                 104 Moose Hill Road
               </h1>
-              <p style={{ fontFamily:"'Playfair Display', serif", fontStyle:"italic", fontSize:"clamp(1rem,2.5vw,1.4rem)", color:"#5A4A3A", marginBottom:40 }}>
+              <p style={{ fontFamily:"'Playfair Display', serif", fontStyle:"italic", fontSize:"clamp(1.2rem,3vw,1.8rem)", color:"#5A4A3A", marginBottom:40 }}>
                 Oxford, Connecticut
               </p>
               <div style={{ display:"flex", gap:16, justifyContent:"center", flexWrap:"wrap", marginBottom:16 }}>
