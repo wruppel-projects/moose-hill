@@ -435,7 +435,7 @@ export default function App() {
               <div style={{ display:"flex", gap:16, justifyContent:"center", flexWrap:"wrap", marginBottom:16 }}>
                 <button onClick={() => nav("reserve")}
                   style={{ padding:"15px 36px", background:"#1F3D2B", color:"#F4F1E8", border:"none", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"1rem", fontWeight:600, cursor:"pointer" }}>
-                  Reserve a Room
+                  Plan Your Stay
                 </button>
                 <button onClick={() => nav("calendar")}
                   style={{ padding:"15px 36px", background:"transparent", color:"#1F3D2B", border:"1.5px solid #1F3D2B", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"1rem", cursor:"pointer" }}>
