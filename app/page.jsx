@@ -303,7 +303,14 @@ export default function App() {
             <p style={{ color:"#fff", fontSize:"0.82rem", letterSpacing:"0.1em", textTransform:"uppercase", fontWeight:700, marginBottom:16 }}>Family Access PIN</p>
             <input
               value={pinInput}
-              onChange={e => setPinInput(e.target.value)}
+              onChange={e => {
+                const val = e.target.value.replace(/[^0-9]/g,'').slice(0,4);
+                setPinInput(val);
+                if (val.length === 4) {
+                  if (val === PIN) { setUnlocked(true); try { sessionStorage.setItem('moosehill-unlocked','1'); } catch {} setPinError(''); }
+                  else { setPinError('Incorrect PIN.'); setPinInput(''); }
+                } else { setPinError(''); }
+              }}
               onKeyDown={e => e.key === "Enter" && (pinInput === PIN ? (setUnlocked(true), sessionStorage.setItem("moosehill-unlocked","1"), setPinError("")) : (setPinError("Incorrect PIN."), setPinInput("")))}
               type="password" inputMode="numeric" pattern="[0-9]*"
               placeholder="Enter PIN"
@@ -855,25 +862,25 @@ export default function App() {
           const [editing, setEditing] = useState(subtask.editing||false);
           const ss = STATUS_STYLE[subtask.status||"Not Started"];
           return (
-            <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 12px 8px 48px", borderBottom:"1px solid #F3F4F6", background:"#FAFAFA" }}>
-              <span style={{ color:"#D1D5DB", fontSize:"0.8rem" }}>↳</span>
-              {editing ? (
-                <input autoFocus defaultValue={subtask.name} onBlur={e => { updateSubtask(projectId,subtask.id,{name:e.target.value,editing:false}); setEditing(false); }} onKeyDown={e => e.key==="Enter"&&e.target.blur()}
-                  style={{ flex:1, border:"1px solid #9CAF88", borderRadius:5, padding:"3px 8px", fontSize:"0.85rem", fontFamily:"'Lora',serif", color:C.brown, background:"#fff" }} />
-              ) : (
-                <span onClick={() => setEditing(true)} style={{ flex:1, fontSize:"0.85rem", color:subtask.name?C.brown:"#9CA3AF", cursor:"text", fontStyle:subtask.name?"normal":"italic" }}>{subtask.name||"Click to name"}</span>
-              )}
-              <select value={subtask.status||"Not Started"} onChange={e => updateSubtask(projectId,subtask.id,{status:e.target.value})}
-                style={{ appearance:"none", WebkitAppearance:"none", background:ss.bg, color:ss.color, border:"1px solid "+ss.border, borderRadius:6, padding:"3px 8px", fontSize:"0.72rem", fontWeight:600, cursor:"pointer", fontFamily:"'Lora',serif" }}>
-                {STATUSES.map(st => <option key={st} value={st}>{st}</option>)}
-              </select>
-              <OwnerField value={subtask.owner||""} onChange={v => updateSubtask(projectId,subtask.id,{owner:v})} />
-              <button onClick={() => openNotes(subtask.id,true,projectId)}
-                style={{ background:subtask.notes?"#FEF3C7":"#F3F4F6", border:"1px solid "+(subtask.notes?"#FCD34D":"#E5E7EB"), borderRadius:5, padding:"3px 8px", fontSize:"0.72rem", cursor:"pointer", color:subtask.notes?"#92400E":"#6B7280", whiteSpace:"nowrap" }}>
-                {subtask.notes?"📝 Notes":"Notes"}
-              </button>
-              <button onClick={() => deleteSubtask(projectId,subtask.id)}
-                style={{ background:"none", border:"none", cursor:"pointer", color:"#D1D5DB", fontSize:"0.9rem", padding:"2px 4px" }}>✕</button>
+            <div style={{ padding:"8px 12px 8px 48px", borderBottom:"1px solid #F3F4F6", background:"#FAFAFA" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:4 }}>
+                <span style={{ color:"#D1D5DB", fontSize:"0.8rem", flexShrink:0 }}>↳</span>
+                {editing ? (
+                  <input autoFocus defaultValue={subtask.name} onBlur={e => { updateSubtask(projectId,subtask.id,{name:e.target.value,editing:false}); setEditing(false); }} onKeyDown={e => e.key==="Enter"&&e.target.blur()}
+                    style={{ flex:1, border:"1px solid #9CAF88", borderRadius:5, padding:"3px 8px", fontSize:"0.85rem", fontFamily:"'Lora',serif", color:C.brown, background:"#fff", minWidth:0 }} />
+                ) : (
+                  <span onClick={() => setEditing(true)} style={{ flex:1, fontSize:"0.85rem", color:subtask.name?C.brown:"#9CA3AF", cursor:"text", fontStyle:subtask.name?"normal":"italic", minWidth:0, wordBreak:"break-word" }}>{subtask.name||"Tap to name"}</span>
+                )}
+                <button onClick={() => deleteSubtask(projectId,subtask.id)}
+                  style={{ background:"none", border:"none", cursor:"pointer", color:"#D1D5DB", fontSize:"0.9rem", padding:"2px 4px", flexShrink:0 }}>✕</button>
+              </div>
+              <div style={{ display:"flex", alignItems:"center", gap:8, paddingLeft:16, flexWrap:"wrap" }}>
+                <select value={subtask.status||"Not Started"} onChange={e => updateSubtask(projectId,subtask.id,{status:e.target.value})}
+                  style={{ appearance:"none", WebkitAppearance:"none", background:ss.bg, color:ss.color, border:"1px solid "+ss.border, borderRadius:6, padding:"3px 8px", fontSize:"0.72rem", fontWeight:600, cursor:"pointer", fontFamily:"'Lora',serif" }}>
+                  {STATUSES.map(st => <option key={st} value={st}>{st}</option>)}
+                </select>
+                <OwnerField value={subtask.owner||""} onChange={v => updateSubtask(projectId,subtask.id,{owner:v})} />
+              </div>
             </div>
           );
         }
