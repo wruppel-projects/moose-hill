@@ -15,9 +15,9 @@ const ROOMS = [
 
 const PLACES = [
   { category: "Essentials and Stores",         name: "Market 32",                  type: "Grocery Store", distance: "2.0 mi", drive: "6 min",  maps: "https://maps.google.com/?q=Market+32+Oxford+CT",                   hours: "Daily 6am-11pm" },
-  { category: "Essentials and Stores", name: "Dunkin",             type: "Coffee & Donuts", distance: "1.9 mi", drive: "5 min", maps: "https://maps.apple/p/wUIuMh-VXZqTzL" },
-  { category: "Essentials and Stores", name: "Fritz's Snack Bar",   type: "Snack Bar",        distance: "2.0 mi", drive: "5 min", maps: "https://maps.apple/p/YdLNBI2MDU..oD" },
-  { category: "Essentials and Stores", name: "Oxford Liquor Shoppe", type: "Liquor Store",     distance: "2.2 mi", drive: "5 min", maps: "https://maps.apple/p/tVF0u9tQy9SpTQ" },
+  { category: "Essentials and Stores", name: "Dunkin",              type: "Coffee & Donuts", distance: "1.9 mi", drive: "5 min", maps: "https://maps.apple/p/wUIuMh-VXZqTzL" },
+  { category: "Essentials and Stores", name: "Fritz's Snack Bar",   type: "Snack Bar",       distance: "2.0 mi", drive: "5 min", maps: "https://maps.apple/p/YdLNBI2MDU..oD" },
+  { category: "Essentials and Stores", name: "Oxford Liquor Shoppe", type: "Liquor Store",    distance: "2.2 mi", drive: "5 min", maps: "https://maps.apple/p/tVF0u9tQy9SpTQ" },
   { category: "Essentials and Stores",         name: "Ace Hardware by Chatfield",  type: "Hardware Store", distance: "2.0 mi", drive: "6 min",  maps: "https://maps.google.com/?q=Ace+Hardware+Chatfield+Oxford+CT",      hours: "Mon-Fri 7:30am-6pm, Sat 7:30am-5pm, Sun 8am-4pm" },
   { category: "Parks & Trails",     name: "Southford Falls State Park", type: "Waterfall & Covered Bridge", distance: "3.0 mi", drive: "8 min",  maps: "https://maps.google.com/?q=Southford+Falls+State+Park+CT",        hours: "Open daily" },
   { category: "Parks & Trails",     name: "Jackson Cove Town Park",     type: "Lake Beach & Boat Launch", distance: "4.1 mi", drive: "10 min", maps: "https://maps.google.com/?q=Jackson+Cove+Town+Park+Oxford+CT",     hours: "Daily 7am-8pm" },
@@ -216,14 +216,14 @@ export default function App() {
 
   if (!unlocked) {
     return (
-      <div style={{ minHeight:"100vh", background:"#1C1510", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"Georgia, serif", padding:"2rem" }}>
+      <div style={{ minHeight:"100vh", background:"#F7F3EE", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"Georgia, serif", padding:"2rem" }}>
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:wght@400;500;600&display=swap" rel="stylesheet" />
         <div style={{ textAlign:"center", maxWidth:400, width:"100%" }}>
-          <div style={{ width:"100%", height:220, borderRadius:16, overflow:"hidden", marginBottom:24, boxShadow:"0 8px 40px rgba(0,0,0,0.4)" }}><img src="/HomepageImage.jpeg" alt="104 Moose Hill Road" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 30%" }} /></div>
-          <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"2rem", fontWeight:900, color:"#F5EFE4", marginBottom:4 }}>104 Moose Hill Road</h1>
-          <p style={{ fontFamily:"'Playfair Display', serif", fontStyle:"italic", color:"#C4A882", marginBottom:36, fontSize:"0.95rem" }}>Oxford, Connecticut</p>
+          <div style={{ width:"100%", height:220, borderRadius:16, overflow:"hidden", marginBottom:24, boxShadow:"0 4px 20px rgba(61,43,31,0.15)" }}><img src="/HomepageImage.jpeg" alt="104 Moose Hill Road" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 30%" }} /></div>
+          <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"2rem", fontWeight:900, color:"#3D2B1F", marginBottom:4 }}>104 Moose Hill Road</h1>
+          <p style={{ fontFamily:"'Playfair Display', serif", fontStyle:"italic", color:"#8A7A6A", marginBottom:36, fontSize:"0.95rem" }}>Oxford, Connecticut</p>
           <div style={{ background:"#2C1F14", borderRadius:16, padding:"2rem", boxShadow:"0 8px 40px rgba(0,0,0,0.4)" }}>
-            <p style={{ color:"#8A7A6A", fontSize:"0.82rem", letterSpacing:"0.1em", textTransform:"uppercase", fontWeight:700, marginBottom:16 }}>Family Access PIN</p>
+            <p style={{ color:"#5A4A3A", fontSize:"0.82rem", letterSpacing:"0.1em", textTransform:"uppercase", fontWeight:700, marginBottom:16 }}>Family Access PIN</p>
             <input
               value={pinInput}
               onChange={e => setPinInput(e.target.value)}
@@ -231,12 +231,12 @@ export default function App() {
               type="password" inputMode="numeric" pattern="[0-9]*"
               placeholder="Enter PIN"
               autoFocus
-              style={{ width:"100%", padding:"14px 16px", background:"#1C1510", border:"1.5px solid #3D2B1F", borderRadius:10, fontFamily:"'Lora', serif", fontSize:"1.2rem", color:"#F5EFE4", textAlign:"center", letterSpacing:"0.3em", outline:"none", marginBottom:12, boxSizing:"border-box" }}
+              style={{ width:"100%", padding:"14px 16px", background:"#fff", border:"1.5px solid #C4A882", borderRadius:10, fontFamily:"'Lora', serif", fontSize:"1.2rem", color:"#3D2B1F", textAlign:"center", letterSpacing:"0.3em", outline:"none", marginBottom:12, boxSizing:"border-box" }}
             />
             {pinError && <div style={{ color:"#E07070", fontSize:"0.8rem", marginBottom:10 }}>{pinError}</div>}
             <button
               onClick={() => pinInput === PIN ? (setUnlocked(true), sessionStorage.setItem("moosehill-unlocked","1"), setPinError("")) : (setPinError("Incorrect PIN."), setPinInput(""))}
-              style={{ width:"100%", padding:"13px", background:"#C4A882", color:"#1C1510", border:"none", borderRadius:10, fontFamily:"'Lora', serif", fontSize:"0.95rem", fontWeight:700, cursor:"pointer" }}
+              style={{ width:"100%", padding:"13px", background:"#3D2B1F", color:"#F7F3EE", border:"none", borderRadius:10, fontFamily:"'Lora', serif", fontSize:"0.95rem", fontWeight:700, cursor:"pointer" }}
             >
               Enter
             </button>
@@ -312,40 +312,40 @@ export default function App() {
       {/* HOME PAGE */}
       {page === "home" && (
         <div>
-          <div style={{ background:C.dark, position:"relative", overflow:"hidden", minHeight:"85vh", display:"flex", alignItems:"center", justifyContent:"center" }}>
-            <div style={{ position:"absolute", inset:0, opacity:0.04, background:"radial-gradient(circle, #fff 1px, transparent 1px)", backgroundSize:"24px 24px" }} />
+          <div style={{ background:"#F0EBE3", position:"relative", overflow:"hidden", minHeight:"85vh", display:"flex", alignItems:"center", justifyContent:"center" }}>
+            <div style={{ position:"absolute", inset:0, opacity:0.06, background:"radial-gradient(circle, #3D2B1F 1px, transparent 1px)", backgroundSize:"28px 28px" }} />
             <div style={{ textAlign:"center", padding:"4rem 2rem", position:"relative", zIndex:1 }}>
-              <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"clamp(2.8rem,7vw,5.5rem)", fontWeight:900, color:"#F5EFE4", letterSpacing:"-0.02em", lineHeight:1, marginBottom:12 }}>
+              <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"clamp(2.8rem,7vw,5.5rem)", fontWeight:900, color:"#3D2B1F", letterSpacing:"-0.02em", lineHeight:1, marginBottom:12 }}>
                 104 Moose Hill Road
               </h1>
-              <p style={{ fontFamily:"'Playfair Display', serif", fontStyle:"italic", fontSize:"clamp(1rem,2.5vw,1.4rem)", color:C.tan, marginBottom:40 }}>
+              <p style={{ fontFamily:"'Playfair Display', serif", fontStyle:"italic", fontSize:"clamp(1rem,2.5vw,1.4rem)", color:"#5A4A3A", marginBottom:40 }}>
                 Oxford, Connecticut
               </p>
               <div style={{ display:"flex", gap:16, justifyContent:"center", flexWrap:"wrap", marginBottom:16 }}>
                 <button onClick={() => nav("reserve")}
-                  style={{ padding:"15px 36px", background:C.tan, color:C.dark, border:"none", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"1rem", fontWeight:600, cursor:"pointer" }}>
+                  style={{ padding:"15px 36px", background:"#3D2B1F", color:"#F7F3EE", border:"none", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"1rem", fontWeight:600, cursor:"pointer" }}>
                   Reserve a Room
                 </button>
                 <button onClick={() => nav("calendar")}
-                  style={{ padding:"15px 36px", background:"transparent", color:"#F5EFE4", border:"1.5px solid #5C4A32", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"1rem", cursor:"pointer" }}>
+                  style={{ padding:"15px 36px", background:"transparent", color:"#3D2B1F", border:"1.5px solid #3D2B1F", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"1rem", cursor:"pointer" }}>
                   See Calendar
                 </button>
               </div>
               <div style={{ display:"flex", gap:10, justifyContent:"center", flexWrap:"wrap" }}>
                 <button onClick={() => nav("wifi")}
-                  style={{ padding:"9px 20px", background:"transparent", color:"#8A7A6A", border:"1px solid #3D2B1F", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"0.82rem", cursor:"pointer" }}>
+                  style={{ padding:"9px 20px", background:"transparent", color:"#3D2B1F", border:"1.5px solid #5C4A32", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"0.82rem", cursor:"pointer" }}>
                   WiFi & Codes
                 </button>
                 <button onClick={() => window.open("/Oxford.pdf", "_blank")}
-                  style={{ padding:"9px 20px", background:"transparent", color:"#8A7A6A", border:"1px solid #3D2B1F", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"0.82rem", cursor:"pointer" }}>
+                  style={{ padding:"9px 20px", background:"transparent", color:"#3D2B1F", border:"1.5px solid #5C4A32", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"0.82rem", cursor:"pointer" }}>
                   Oxford, CT
                 </button>
                 <button onClick={() => nav("places")}
-                  style={{ padding:"9px 20px", background:"transparent", color:"#8A7A6A", border:"1px solid #3D2B1F", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"0.82rem", cursor:"pointer" }}>
+                  style={{ padding:"9px 20px", background:"transparent", color:"#3D2B1F", border:"1.5px solid #5C4A32", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"0.82rem", cursor:"pointer" }}>
                   Explore Nearby
                 </button>
                 <button onClick={() => nav("appliances")}
-                  style={{ padding:"9px 20px", background:"transparent", color:"#8A7A6A", border:"1px solid #3D2B1F", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"0.82rem", cursor:"pointer" }}>
+                  style={{ padding:"9px 20px", background:"transparent", color:"#3D2B1F", border:"1.5px solid #5C4A32", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"0.82rem", cursor:"pointer" }}>
                   Appliances
                 </button>
               </div>
@@ -732,7 +732,7 @@ export default function App() {
           onClick={e => e.target === e.currentTarget && setModalOpen(false)}>
           <div style={{ background:"#fff", borderRadius:18, padding:"2rem", width:"100%", maxWidth:420, boxShadow:"0 12px 60px rgba(0,0,0,0.25)" }}>
             <div style={{ fontFamily:"'Playfair Display', serif", fontSize:"1.5rem", fontWeight:700, color:C.brown, marginBottom:2 }}>{room.name}</div>
-            <div style={{ fontSize:"0.82rem", color:C.muted, marginBottom:16 }}>{formatDisplay(sel.start)}{sel.end && sel.end !== sel.start ? " to " + formatDisplay(sel.end) : ""}</div>
+            <div style={{ fontSize:"1.05rem", color:C.brown, fontWeight:600, marginBottom:16 }}>{formatDisplay(sel.start)}{sel.end && sel.end !== sel.start ? " to " + formatDisplay(sel.end) : ""}</div>
             {formError && <div style={{ background:"#FDEAEA", color:"#C0392B", borderRadius:7, padding:"8px 12px", fontSize:"0.82rem", marginBottom:12 }}>{formError}</div>}
             {[
               { label:"Your Name", key:"name", placeholder:"e.g. Jane Smith" },
