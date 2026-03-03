@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 
 const IMG_TAFT = "/taft.jpg";
 const IMG_HAMILTON = "/hamilton.jpg";
@@ -139,6 +139,86 @@ export default function App() {
     setSuccess("Booking cancelled."); setTimeout(() => setSuccess(""), 4000);
   }
 
+  // ── PROJECTS ──
+  const [projects, setProjects] = useState([]);
+  const [projectsLoaded, setProjectsLoaded] = useState(false);
+  const [notesModal, setNotesModal] = useState(null);
+  const [notesText, setNotesText] = useState("");
+  const [expandedProjects, setExpandedProjects] = useState({});
+  const [dragState, setDragState] = useState(null);
+  const dragOverRef = useRef(null);
+
+  useEffect(() => {
+    if (unlocked && !projectsLoaded) {
+      fetch("/api/projects")
+        .then(r => r.json())
+        .then(data => { if (Array.isArray(data)) setProjects(data); setProjectsLoaded(true); })
+        .catch(() => setProjectsLoaded(true));
+    }
+  }, [unlocked]);
+
+  async function saveProjects(updated) {
+    setProjects(updated);
+    try {
+      await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updated),
+      });
+    } catch {}
+  }
+
+  function addProject(status) {
+    const np = { id: Date.now().toString(), name: "", status, owner: "", notes: "", subtasks: [], editing: true };
+    saveProjects([np, ...projects]);
+  }
+
+  function updateProject(id, changes) {
+    saveProjects(projects.map(p => p.id === id ? { ...p, ...changes } : p));
+  }
+
+  function deleteProject(id) {
+    saveProjects(projects.filter(p => p.id !== id));
+  }
+
+  function addSubtask(projectId) {
+    const ns = { id: Date.now().toString(), name: "", status: "Not Started", owner: "", notes: "", editing: true };
+    saveProjects(projects.map(p => p.id === projectId ? { ...p, subtasks: [...(p.subtasks||[]), ns] } : p));
+  }
+
+  function updateSubtask(projectId, subtaskId, changes) {
+    saveProjects(projects.map(p => p.id === projectId
+      ? { ...p, subtasks: (p.subtasks||[]).map(s => s.id === subtaskId ? { ...s, ...changes } : s) }
+      : p));
+  }
+
+  function deleteSubtask(projectId, subtaskId) {
+    saveProjects(projects.map(p => p.id === projectId
+      ? { ...p, subtasks: (p.subtasks||[]).filter(s => s.id !== subtaskId) }
+      : p));
+  }
+
+  function openNotes(id, isSubtask, parentId) {
+    let text = "";
+    if (isSubtask) {
+      const p = projects.find(x => x.id === parentId);
+      const s = p && (p.subtasks||[]).find(x => x.id === id);
+      text = s ? s.notes || "" : "";
+    } else {
+      const p = projects.find(x => x.id === id);
+      text = p ? p.notes || "" : "";
+    }
+    setNotesText(text);
+    setNotesModal({ id, isSubtask, parentId });
+  }
+
+  function saveNotes() {
+    if (!notesModal) return;
+    if (notesModal.isSubtask) updateSubtask(notesModal.parentId, notesModal.id, { notes: notesText });
+    else updateProject(notesModal.id, { notes: notesText });
+    setNotesModal(null);
+  }
+
   function CalGrid({ roomId, readonly }) {
     const r = ROOMS.find(r => r.id === roomId);
     const { year, month } = calMonth;
@@ -213,6 +293,7 @@ export default function App() {
     { label:"The House", items:[
       { id:"wifi", label:"WiFi & Codes" },
       { id:"appliances", label:"Appliances" },
+      { id:"projects", label:"Projects" },
     ]},
     { label:"Explore", items:[
       { id:"places", label:"Nearby Places" },
@@ -225,6 +306,7 @@ export default function App() {
     { id:"calendar", label:"Calendar" },
     { id:"wifi", label:"WiFi & Codes" },
     { id:"appliances", label:"Appliances" },
+    { id:"projects", label:"Projects" },
     { id:"places", label:"Nearby Places" },
     { id:"oxford", label:"Oxford, CT" },
   ];
@@ -393,6 +475,10 @@ export default function App() {
                 <button onClick={() => nav("appliances")}
                   style={{ padding:"9px 20px", background:"transparent", color:"#3D2B1F", border:"1.5px solid #5C4A32", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"0.82rem", cursor:"pointer" }}>
                   Appliances
+                </button>
+                <button onClick={() => nav("projects")}
+                  style={{ padding:"9px 20px", background:"transparent", color:"#3D2B1F", border:"1.5px solid #5C4A32", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"0.82rem", cursor:"pointer" }}>
+                  Projects
                 </button>
               </div>
             </div>
@@ -758,6 +844,179 @@ export default function App() {
         </div>
       )}
 
+      {/* PROJECTS PAGE */}
+      {page === "projects" && (() => {
+        const STATUSES = ["Not Started","In Progress","Completed"];
+        const STATUS_STYLE = {
+          "Not Started": { bg:"#F3F4F6", color:"#4B5563", border:"#D1D5DB", dot:"#9CA3AF" },
+          "In Progress": { bg:"#EFF6FF", color:"#1D4ED8", border:"#BFDBFE", dot:"#3B82F6" },
+          "Completed":   { bg:"#F0FDF4", color:"#15803D", border:"#BBF7D0", dot:"#22C55E" },
+        };
+        const SECTION_STYLE = {
+          "Not Started": { header:"#F9FAFB", accent:"#6B7280" },
+          "In Progress": { header:"#EFF6FF", accent:"#2563EB" },
+          "Completed":   { header:"#F0FDF4", accent:"#16A34A" },
+        };
+
+        function StatusBadge({ value, onChange }) {
+          const s = STATUS_STYLE[value] || STATUS_STYLE["Not Started"];
+          return (
+            <select value={value} onChange={e => onChange(e.target.value)}
+              style={{ appearance:"none", WebkitAppearance:"none", background:s.bg, color:s.color, border:"1px solid "+s.border, borderRadius:6, padding:"3px 10px 3px 8px", fontSize:"0.75rem", fontWeight:600, cursor:"pointer", fontFamily:"'Lora', serif" }}>
+              {STATUSES.map(st => <option key={st} value={st}>{st}</option>)}
+            </select>
+          );
+        }
+
+        function SubtaskRow({ subtask, projectId }) {
+          const [editing, setEditing] = useState(subtask.editing||false);
+          return (
+            <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 12px 8px 48px", borderBottom:"1px solid #F3F4F6", background:"#FAFAFA" }}>
+              <span style={{ color:"#D1D5DB", fontSize:"0.8rem", marginRight:2 }}>↳</span>
+              {editing ? (
+                <input autoFocus defaultValue={subtask.name} onBlur={e => { updateSubtask(projectId, subtask.id, { name:e.target.value, editing:false }); setEditing(false); }} onKeyDown={e => e.key==="Enter" && e.target.blur()}
+                  style={{ flex:1, border:"1px solid #C4A882", borderRadius:5, padding:"3px 8px", fontSize:"0.85rem", fontFamily:"'Lora',serif", color:C.brown }} />
+              ) : (
+                <span onClick={() => setEditing(true)} style={{ flex:1, fontSize:"0.85rem", color:subtask.name ? C.brown : "#9CA3AF", cursor:"text", fontStyle:subtask.name?"normal":"italic" }}>{subtask.name||"Click to name subtask"}</span>
+              )}
+              <select value={subtask.status||"Not Started"} onChange={e => updateSubtask(projectId, subtask.id, { status:e.target.value })}
+                style={{ appearance:"none", WebkitAppearance:"none", background:STATUS_STYLE[subtask.status||"Not Started"].bg, color:STATUS_STYLE[subtask.status||"Not Started"].color, border:"1px solid "+STATUS_STYLE[subtask.status||"Not Started"].border, borderRadius:6, padding:"3px 8px", fontSize:"0.72rem", fontWeight:600, cursor:"pointer", fontFamily:"'Lora', serif" }}>
+                {STATUSES.map(st => <option key={st} value={st}>{st}</option>)}
+              </select>
+              <OwnerField value={subtask.owner||""} onChange={v => updateSubtask(projectId, subtask.id, { owner:v })} />
+              <button onClick={() => openNotes(subtask.id, true, projectId)}
+                style={{ background: subtask.notes ? "#FEF3C7" : "#F3F4F6", border:"1px solid "+(subtask.notes?"#FCD34D":"#E5E7EB"), borderRadius:5, padding:"3px 8px", fontSize:"0.72rem", cursor:"pointer", color: subtask.notes?"#92400E":"#6B7280", whiteSpace:"nowrap" }}>
+                {subtask.notes ? "📝 Notes" : "Notes"}
+              </button>
+              <button onClick={() => deleteSubtask(projectId, subtask.id)}
+                style={{ background:"none", border:"none", cursor:"pointer", color:"#D1D5DB", fontSize:"0.9rem", padding:"2px 4px" }}>✕</button>
+            </div>
+          );
+        }
+
+        function OwnerField({ value, onChange }) {
+          const [editing, setEditing] = useState(false);
+          return editing ? (
+            <input autoFocus defaultValue={value} onBlur={e => { onChange(e.target.value); setEditing(false); }} onKeyDown={e => e.key==="Enter" && e.target.blur()}
+              style={{ width:90, border:"1px solid #C4A882", borderRadius:5, padding:"3px 6px", fontSize:"0.78rem", fontFamily:"'Lora',serif", color:C.brown }} />
+          ) : (
+            <span onClick={() => setEditing(true)} style={{ width:90, fontSize:"0.78rem", color:value?C.brown:"#9CA3AF", cursor:"text", fontStyle:value?"normal":"italic", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+              {value||"Owner"}
+            </span>
+          );
+        }
+
+        function ProjectRow({ project, sectionStatus }) {
+          const [editing, setEditing] = useState(project.editing||false);
+          const expanded = expandedProjects[project.id];
+          const subtasks = project.subtasks||[];
+
+          function handleStatusChange(newStatus) {
+            if (newStatus !== project.status) {
+              updateProject(project.id, { status: newStatus });
+            }
+          }
+
+          return (
+            <div
+              draggable
+              onDragStart={() => setDragState({ id:project.id, fromStatus:sectionStatus })}
+              onDragEnd={() => setDragState(null)}
+              style={{ background:"#fff", borderBottom:"1px solid #F3F4F6", cursor:"grab", opacity: dragState && dragState.id===project.id ? 0.5 : 1 }}>
+              <div style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 14px" }}>
+                <span style={{ color:"#D1D5DB", cursor:"grab", fontSize:"0.9rem", userSelect:"none" }}>⠿</span>
+                <button onClick={() => setExpandedProjects(p => ({...p, [project.id]:!p[project.id]}))}
+                  style={{ background:"none", border:"none", cursor:"pointer", color:"#9CA3AF", fontSize:"0.75rem", padding:"0 2px", transform: expanded?"rotate(90deg)":"rotate(0deg)", transition:"transform 0.15s" }}>▶</button>
+                {editing ? (
+                  <input autoFocus defaultValue={project.name} onBlur={e => { updateProject(project.id, { name:e.target.value, editing:false }); setEditing(false); }} onKeyDown={e => e.key==="Enter" && e.target.blur()}
+                    style={{ flex:1, border:"1px solid #C4A882", borderRadius:5, padding:"4px 10px", fontSize:"0.9rem", fontFamily:"'Lora',serif", color:C.brown, fontWeight:600 }} />
+                ) : (
+                  <span onClick={() => setEditing(true)} style={{ flex:1, fontSize:"0.9rem", fontWeight:600, color:project.name?C.brown:"#9CA3AF", cursor:"text", fontStyle:project.name?"normal":"italic", textDecoration: project.status==="Completed"?"line-through":"none", opacity: project.status==="Completed"?0.7:1 }}>
+                    {project.name||"Click to name project"}
+                  </span>
+                )}
+                <StatusBadge value={project.status} onChange={handleStatusChange} />
+                <OwnerField value={project.owner||""} onChange={v => updateProject(project.id, { owner:v })} />
+                <button onClick={() => openNotes(project.id, false, null)}
+                  style={{ background: project.notes ? "#FEF3C7" : "#F3F4F6", border:"1px solid "+(project.notes?"#FCD34D":"#E5E7EB"), borderRadius:5, padding:"4px 10px", fontSize:"0.75rem", cursor:"pointer", color: project.notes?"#92400E":"#6B7280", whiteSpace:"nowrap" }}>
+                  {project.notes ? "📝 Notes" : "Notes"}
+                </button>
+                <button onClick={() => deleteProject(project.id)}
+                  style={{ background:"none", border:"none", cursor:"pointer", color:"#D1D5DB", fontSize:"1rem", padding:"2px 6px" }}>✕</button>
+              </div>
+              {expanded && (
+                <div>
+                  {subtasks.map(s => <SubtaskRow key={s.id} subtask={s} projectId={project.id} />)}
+                  <div style={{ padding:"6px 14px 8px 48px" }}>
+                    <button onClick={() => { addSubtask(project.id); setExpandedProjects(p => ({...p, [project.id]:true})); }}
+                      style={{ background:"none", border:"1px dashed #D1D5DB", borderRadius:5, padding:"4px 12px", fontSize:"0.78rem", color:"#9CA3AF", cursor:"pointer" }}>
+                      + Add subtask
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        return (
+          <div style={{ maxWidth:900, margin:"0 auto", padding:"2rem 1rem" }}>
+            <div style={{ marginBottom:"1.5rem", display:"flex", alignItems:"flex-end", justifyContent:"space-between" }}>
+              <div>
+                <div style={{ fontSize:"0.7rem", letterSpacing:"0.2em", textTransform:"uppercase", color:C.muted, marginBottom:6, fontWeight:700 }}>The House</div>
+                <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"clamp(1.8rem,4vw,2.4rem)", fontWeight:700, color:C.brown, margin:0 }}>Projects</h1>
+              </div>
+              <button onClick={() => addProject("Not Started")}
+                style={{ background:C.brown, color:"#F7F3EE", border:"none", borderRadius:8, padding:"10px 20px", fontFamily:"'Lora', serif", fontSize:"0.88rem", fontWeight:600, cursor:"pointer" }}>
+                + New Project
+              </button>
+            </div>
+
+            {!projectsLoaded ? (
+              <div style={{ textAlign:"center", padding:"3rem", color:C.muted }}>Loading projects…</div>
+            ) : (
+              <div style={{ display:"flex", flexDirection:"column", gap:"1.5rem" }}>
+                {STATUSES.map(status => {
+                  const sectionProjects = projects.filter(p => p.status === status);
+                  const ss = SECTION_STYLE[status];
+                  return (
+                    <div key={status}
+                      onDragOver={e => { e.preventDefault(); dragOverRef.current = status; }}
+                      onDrop={() => {
+                        if (!dragState || dragState.fromStatus === status) return;
+                        updateProject(dragState.id, { status });
+                        setDragState(null);
+                      }}
+                      style={{ borderRadius:12, overflow:"hidden", boxShadow:"0 2px 12px rgba(0,0,0,0.06)", border:"2px solid "+(dragState && dragOverRef.current===status && dragState.fromStatus!==status ? ss.accent : "transparent"), transition:"border 0.15s" }}>
+                      <div style={{ background:ss.header, padding:"10px 14px", display:"flex", alignItems:"center", justifyContent:"space-between", borderBottom:"1px solid #E5E7EB" }}>
+                        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                          <span style={{ width:10, height:10, borderRadius:"50%", background:ss.accent, display:"inline-block" }} />
+                          <span style={{ fontFamily:"'Playfair Display', serif", fontWeight:700, fontSize:"1rem", color:C.brown }}>{status}</span>
+                          <span style={{ background:"#E5E7EB", color:"#6B7280", borderRadius:10, padding:"1px 8px", fontSize:"0.72rem", fontWeight:600 }}>{sectionProjects.length}</span>
+                        </div>
+                        <button onClick={() => addProject(status)}
+                          style={{ background:"none", border:"1px solid #D1D5DB", borderRadius:6, padding:"3px 10px", fontSize:"0.75rem", color:"#6B7280", cursor:"pointer" }}>
+                          + Add
+                        </button>
+                      </div>
+                      <div style={{ background:"#fff" }}>
+                        {sectionProjects.length === 0 ? (
+                          <div style={{ padding:"20px 14px", color:"#D1D5DB", fontSize:"0.85rem", fontStyle:"italic", textAlign:"center" }}>
+                            No projects — drag one here or click + Add
+                          </div>
+                        ) : (
+                          sectionProjects.map(p => <ProjectRow key={p.id} project={p} sectionStatus={status} />)
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
       {/* FOOTER */}
       <footer style={{ background:C.dark, borderTop:"1px solid #3D2B1F", padding:"2rem 1.5rem", textAlign:"center" }}>
         <div style={{ fontFamily:"'Playfair Display', serif", fontSize:"1rem", color:"#F5EFE4", marginBottom:6 }}>104 Moose Hill Road</div>
@@ -771,6 +1030,25 @@ export default function App() {
           ))}
         </div>
       </footer>
+
+      {/* PROJECTS NOTES MODAL */}
+      {notesModal && (
+        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.55)", zIndex:500, display:"flex", alignItems:"center", justifyContent:"center", padding:"1rem" }}
+          onClick={e => e.target===e.currentTarget && setNotesModal(null)}>
+          <div style={{ background:"#fff", borderRadius:16, padding:"1.8rem", width:"100%", maxWidth:480, boxShadow:"0 12px 60px rgba(0,0,0,0.25)" }}>
+            <div style={{ fontFamily:"'Playfair Display', serif", fontSize:"1.2rem", fontWeight:700, color:C.brown, marginBottom:16 }}>Notes</div>
+            <textarea value={notesText} onChange={e => setNotesText(e.target.value)} autoFocus
+              placeholder="Add notes here..."
+              style={{ width:"100%", minHeight:160, border:"1.5px solid #E5E7EB", borderRadius:8, padding:"10px 12px", fontFamily:"'Lora',serif", fontSize:"0.9rem", color:C.brown, resize:"vertical", outline:"none", boxSizing:"border-box" }} />
+            <div style={{ display:"flex", gap:10, marginTop:14, justifyContent:"flex-end" }}>
+              <button onClick={() => setNotesModal(null)}
+                style={{ background:"none", border:"1px solid #E5E7EB", borderRadius:8, padding:"8px 18px", fontFamily:"'Lora',serif", fontSize:"0.85rem", color:"#6B7280", cursor:"pointer" }}>Cancel</button>
+              <button onClick={saveNotes}
+                style={{ background:C.brown, color:"#F7F3EE", border:"none", borderRadius:8, padding:"8px 20px", fontFamily:"'Lora',serif", fontSize:"0.85rem", fontWeight:600, cursor:"pointer" }}>Save</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* BOOKING MODAL */}
       {modalOpen && sel.start && (
