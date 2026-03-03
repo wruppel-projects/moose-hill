@@ -204,22 +204,41 @@ export default function App() {
     );
   }
 
-  const navItems = [
-    { id:"home", label:"Home" },
-    { id:"wifi", label:"WiFi & Codes" },
-    { id:"oxford", label:"Oxford, CT" },
-    { id:"calendar", label:"Calendar" },
-    { id:"reserve", label:"Reserve" },
-    { id:"places", label:"Nearby Places" },
-    { id:"appliances", label:"Appliances" },
+  const navGroups = [
+    { label:"Home", id:"home", single:true },
+    { label:"Stay", items:[
+      { id:"reserve", label:"Reserve" },
+      { id:"calendar", label:"Calendar" },
+    ]},
+    { label:"The House", items:[
+      { id:"wifi", label:"WiFi & Codes" },
+      { id:"appliances", label:"Appliances" },
+    ]},
+    { label:"Explore", items:[
+      { id:"places", label:"Nearby Places" },
+      { id:"oxford", label:"Oxford, CT" },
+    ]},
   ];
+  const allNavItems = [
+    { id:"home", label:"Home" },
+    { id:"reserve", label:"Reserve" },
+    { id:"calendar", label:"Calendar" },
+    { id:"wifi", label:"WiFi & Codes" },
+    { id:"appliances", label:"Appliances" },
+    { id:"places", label:"Nearby Places" },
+    { id:"oxford", label:"Oxford, CT" },
+  ];
+  function handleNavClick(id) {
+    if (id === "oxford") { window.open("/Oxford.pdf", "_blank"); return; }
+    nav(id);
+  }
 
   if (!unlocked) {
     return (
       <div style={{ minHeight:"100vh", background:"#F7F3EE", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"Georgia, serif", padding:"2rem" }}>
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:wght@400;500;600&display=swap" rel="stylesheet" />
         <div style={{ textAlign:"center", maxWidth:400, width:"100%" }}>
-          <div style={{ width:"100%", height:220, borderRadius:16, overflow:"hidden", marginBottom:24, boxShadow:"0 4px 20px rgba(61,43,31,0.15)" }}><img src="/HomepageImage.jpeg" alt="104 Moose Hill Road" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center 30%" }} /></div>
+          <div style={{ width:"100%", height:220, borderRadius:16, overflow:"hidden", marginBottom:24, boxShadow:"0 4px 20px rgba(61,43,31,0.15)" }}><img src="/HomepageImage.jpeg" alt="104 Moose Hill Road" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center" }} /></div>
           <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"2rem", fontWeight:900, color:"#3D2B1F", marginBottom:4 }}>104 Moose Hill Road</h1>
           <p style={{ fontFamily:"'Playfair Display', serif", fontStyle:"italic", color:"#8A7A6A", marginBottom:36, fontSize:"0.95rem" }}>Oxford, Connecticut</p>
           <div style={{ background:"#2C1F14", borderRadius:16, padding:"2rem", boxShadow:"0 8px 40px rgba(0,0,0,0.4)" }}>
@@ -277,12 +296,29 @@ export default function App() {
             <div style={{ fontFamily:"'Playfair Display', serif", fontSize:"1.1rem", fontWeight:700, color:"#F5EFE4" }}>104 Moose Hill Road</div>
             <div style={{ fontSize:"0.65rem", color:"#8A7A6A", letterSpacing:"0.12em", textTransform:"uppercase" }}>Oxford, Connecticut</div>
           </button>
-          <div className="desktop-nav" style={{ display:"flex", gap:4 }}>
-            {navItems.map(n => (
-              <button key={n.id} className="nav-btn" onClick={() => n.id === "oxford" ? window.open("/Oxford.pdf", "_blank") : nav(n.id)}
-                style={{ background:"none", border:"none", cursor:"pointer", padding:"8px 14px", fontFamily:"'Lora', serif", fontSize:"0.85rem", color: page===n.id ? "#C4A882" : "#C4B49A", fontWeight: page===n.id ? 600 : 400, borderBottom: page===n.id ? "2px solid #C4A882" : "2px solid transparent", transition:"all 0.15s" }}>
-                {n.label}
+          <div className="desktop-nav" style={{ display:"flex", gap:4, alignItems:"center" }}>
+            {navGroups.map(g => g.single ? (
+              <button key={g.id} className="nav-btn" onClick={() => handleNavClick(g.id)}
+                style={{ background:"none", border:"none", cursor:"pointer", padding:"8px 14px", fontFamily:"'Lora', serif", fontSize:"0.85rem", color: page===g.id ? "#C4A882" : "#C4B49A", fontWeight: page===g.id ? 600 : 400, borderBottom: page===g.id ? "2px solid #C4A882" : "2px solid transparent", transition:"all 0.15s" }}>
+                {g.label}
               </button>
+            ) : (
+              <div key={g.label} style={{ position:"relative" }}
+                onMouseEnter={e => e.currentTarget.querySelector(".nav-dropdown").style.display="block"}
+                onMouseLeave={e => e.currentTarget.querySelector(".nav-dropdown").style.display="none"}>
+                <button className="nav-btn"
+                  style={{ background:"none", border:"none", cursor:"pointer", padding:"8px 14px", fontFamily:"'Lora', serif", fontSize:"0.85rem", color: g.items.some(i => i.id===page) ? "#C4A882" : "#C4B49A", fontWeight: g.items.some(i => i.id===page) ? 600 : 400, borderBottom: g.items.some(i => i.id===page) ? "2px solid #C4A882" : "2px solid transparent", transition:"all 0.15s" }}>
+                  {g.label} ▾
+                </button>
+                <div className="nav-dropdown" style={{ display:"none", position:"absolute", top:"100%", left:0, background:"rgba(28,21,16,0.98)", borderRadius:8, boxShadow:"0 8px 32px rgba(0,0,0,0.4)", minWidth:160, zIndex:500, overflow:"hidden", border:"1px solid #3D2B1F" }}>
+                  {g.items.map(item => (
+                    <button key={item.id} onClick={() => handleNavClick(item.id)}
+                      style={{ display:"block", width:"100%", textAlign:"left", padding:"11px 18px", background:"none", border:"none", borderBottom:"1px solid #3D2B1F", cursor:"pointer", fontFamily:"'Lora', serif", fontSize:"0.85rem", color: page===item.id ? "#C4A882" : "#C4B49A" }}>
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
           <button className="mobile-btn" onClick={() => setMobileMenuOpen(v => !v)}
@@ -292,11 +328,21 @@ export default function App() {
         </div>
         {mobileMenuOpen && (
           <div className="mobile-nav" style={{ background:"#1C1510", borderTop:"1px solid #3D2B1F" }}>
-            {navItems.map(n => (
-              <button key={n.id} onClick={() => n.id === "oxford" ? window.open("/Oxford.pdf", "_blank") : nav(n.id)}
-                style={{ display:"block", width:"100%", textAlign:"left", padding:"12px 1.5rem", background:"none", border:"none", cursor:"pointer", fontFamily:"'Lora', serif", fontSize:"0.95rem", color: page===n.id ? "#C4A882" : "#C4B49A" }}>
-                {n.label}
+            {navGroups.map(g => g.single ? (
+              <button key={g.id} onClick={() => handleNavClick(g.id)}
+                style={{ display:"block", width:"100%", textAlign:"left", padding:"12px 1.5rem", background:"none", border:"none", cursor:"pointer", fontFamily:"'Lora', serif", fontSize:"0.95rem", color: page===g.id ? "#C4A882" : "#C4B49A" }}>
+                {g.label}
               </button>
+            ) : (
+              <div key={g.label}>
+                <div style={{ padding:"10px 1.5rem 4px", fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"#5C4A32", fontFamily:"'Lora', serif" }}>{g.label}</div>
+                {g.items.map(item => (
+                  <button key={item.id} onClick={() => handleNavClick(item.id)}
+                    style={{ display:"block", width:"100%", textAlign:"left", padding:"10px 1.5rem 10px 2.2rem", background:"none", border:"none", cursor:"pointer", fontFamily:"'Lora', serif", fontSize:"0.9rem", color: page===item.id ? "#C4A882" : "#C4B49A" }}>
+                    {item.label}
+                  </button>
+                ))}
+              </div>
             ))}
           </div>
         )}
@@ -313,7 +359,7 @@ export default function App() {
       {page === "home" && (
         <div>
           <div style={{ background:"#F0EBE3", position:"relative", overflow:"hidden", minHeight:"85vh", display:"flex", alignItems:"center", justifyContent:"center" }}>
-            <div style={{ position:"absolute", inset:0, opacity:0.06, background:"radial-gradient(circle, #3D2B1F 1px, transparent 1px)", backgroundSize:"28px 28px" }} />
+            <div style={{ position:"absolute", inset:0, opacity:0.06, background:"radial-gradient(circle, #3D2B1F 1px, transparent 1px)", backgroundSize:"24px 24px" }} />
             <div style={{ textAlign:"center", padding:"4rem 2rem", position:"relative", zIndex:1 }}>
               <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"clamp(2.8rem,7vw,5.5rem)", fontWeight:900, color:"#3D2B1F", letterSpacing:"-0.02em", lineHeight:1, marginBottom:12 }}>
                 104 Moose Hill Road
@@ -717,8 +763,8 @@ export default function App() {
         <div style={{ fontFamily:"'Playfair Display', serif", fontSize:"1rem", color:"#F5EFE4", marginBottom:6 }}>104 Moose Hill Road</div>
         <div style={{ fontSize:"0.75rem", color:C.muted }}>Oxford, Connecticut</div>
         <div style={{ display:"flex", justifyContent:"center", gap:24, marginTop:16 }}>
-          {navItems.map(n => (
-            <button key={n.id} onClick={() => n.id === "oxford" ? window.open("/Oxford.pdf", "_blank") : nav(n.id)}
+          {allNavItems.map(n => (
+            <button key={n.id} onClick={() => handleNavClick(n.id)}
               style={{ background:"none", border:"none", cursor:"pointer", color:C.muted, fontSize:"0.78rem", fontFamily:"'Lora', serif" }}>
               {n.label}
             </button>
