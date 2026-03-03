@@ -393,7 +393,7 @@ export default function App() {
               </button>
             ) : (
               <div key={g.label}>
-                <div style={{ padding:"10px 1.5rem 4px", fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"#4F6F52", fontFamily:"'Lora', serif" }}>{g.label}</div>
+                <div style={{ padding:"10px 1.5rem 4px", fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"#9CAF88", fontFamily:"'Lora', serif" }}>{g.label}</div>
                 {g.items.map(item => (
                   <button key={item.id} onClick={() => handleNavClick(item.id)}
                     style={{ display:"block", width:"100%", textAlign:"left", padding:"10px 1.5rem 10px 2.2rem", background:"none", border:"none", cursor:"pointer", fontFamily:"'Lora', serif", fontSize:"0.9rem", color: page===item.id ? "#9CAF88" : "#E8F0E9" }}>
