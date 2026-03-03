@@ -238,11 +238,11 @@ export default function App() {
       <div style={{ minHeight:"100vh", background:"#F7F3EE", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"Georgia, serif", padding:"2rem" }}>
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:wght@400;500;600&display=swap" rel="stylesheet" />
         <div style={{ textAlign:"center", maxWidth:400, width:"100%" }}>
-          <div style={{ width:"100%", height:220, borderRadius:16, overflow:"hidden", marginBottom:24, boxShadow:"0 4px 20px rgba(61,43,31,0.15)" }}><img src="/HomepageImage.jpeg" alt="104 Moose Hill Road" style={{ width:"100%", height:"100%", objectFit:"cover", objectPosition:"center" }} /></div>
+          <div style={{ width:"100%", borderRadius:16, overflow:"hidden", marginBottom:24, boxShadow:"0 4px 20px rgba(61,43,31,0.15)" }}><img src="/HomepageImage.jpeg" alt="104 Moose Hill Road" style={{ width:"100%", height:"auto", display:"block" }} /></div>
           <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"2rem", fontWeight:900, color:"#3D2B1F", marginBottom:4 }}>104 Moose Hill Road</h1>
-          <p style={{ fontFamily:"'Playfair Display', serif", fontStyle:"italic", color:"#8A7A6A", marginBottom:36, fontSize:"0.95rem" }}>Oxford, Connecticut</p>
+          <p style={{ fontFamily:"'Playfair Display', serif", fontStyle:"italic", color:"#8A7A6A", marginBottom:36, fontSize:"1.1rem" }}>Oxford, Connecticut</p>
           <div style={{ background:"#2C1F14", borderRadius:16, padding:"2rem", boxShadow:"0 8px 40px rgba(0,0,0,0.4)" }}>
-            <p style={{ color:"#5A4A3A", fontSize:"0.82rem", letterSpacing:"0.1em", textTransform:"uppercase", fontWeight:700, marginBottom:16 }}>Family Access PIN</p>
+            <p style={{ color:"#fff", fontSize:"0.82rem", letterSpacing:"0.1em", textTransform:"uppercase", fontWeight:700, marginBottom:16 }}>Family Access PIN</p>
             <input
               value={pinInput}
               onChange={e => setPinInput(e.target.value)}
