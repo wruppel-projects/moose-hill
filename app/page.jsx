@@ -850,7 +850,7 @@ export default function App() {
           const [editing, setEditing] = useState(false);
           return editing ? (
             <input autoFocus defaultValue={value} onBlur={e => { onChange(e.target.value); setEditing(false); }} onKeyDown={e => e.key==="Enter"&&e.target.blur()}
-              style={{ width:90, border:"1px solid #9CAF88", borderRadius:5, padding:"3px 6px", fontSize:"0.78rem", fontFamily:"'Lora',serif", color:C.brown }} />
+              style={{ width:90, border:"1px solid #9CAF88", borderRadius:5, padding:"3px 6px", fontSize:"0.78rem", fontFamily:"'Lora',serif", color:C.brown, background:"#fff" }} />
           ) : (
             <span onClick={() => setEditing(true)} style={{ minWidth:80, fontSize:"0.78rem", color:value?C.brown:"#6B7280", cursor:"text", fontStyle:value?"normal":"italic", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", background:"#fff", border:"1px solid #E5E7EB", borderRadius:5, padding:"3px 8px", display:"inline-block" }}>
               {value||"Add Owner"}
