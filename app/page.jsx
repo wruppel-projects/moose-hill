@@ -380,7 +380,7 @@ export default function App() {
             ))}
           </div>
           <button className="mobile-btn" onClick={() => setMobileMenuOpen(v => !v)}
-            style={{ background:"none", border:"1px solid #2E5A3E", borderRadius:6, padding:"6px 10px", cursor:"pointer", color:"#E8F0E9", fontSize:"1.2rem", display:"none" }}>
+            style={{ background:"none", border:"1px solid #2E5A3E", borderRadius:8, padding:"10px 16px", cursor:"pointer", color:"#E8F0E9", fontSize:"1.5rem", display:"none", lineHeight:1 }}>
             {mobileMenuOpen ? "X" : "="}
           </button>
         </div>
@@ -859,7 +859,7 @@ export default function App() {
               <span style={{ color:"#D1D5DB", fontSize:"0.8rem" }}>↳</span>
               {editing ? (
                 <input autoFocus defaultValue={subtask.name} onBlur={e => { updateSubtask(projectId,subtask.id,{name:e.target.value,editing:false}); setEditing(false); }} onKeyDown={e => e.key==="Enter"&&e.target.blur()}
-                  style={{ flex:1, border:"1px solid #9CAF88", borderRadius:5, padding:"3px 8px", fontSize:"0.85rem", fontFamily:"'Lora',serif", color:C.brown }} />
+                  style={{ flex:1, border:"1px solid #9CAF88", borderRadius:5, padding:"3px 8px", fontSize:"0.85rem", fontFamily:"'Lora',serif", color:C.brown, background:"#fff" }} />
               ) : (
                 <span onClick={() => setEditing(true)} style={{ flex:1, fontSize:"0.85rem", color:subtask.name?C.brown:"#9CA3AF", cursor:"text", fontStyle:subtask.name?"normal":"italic" }}>{subtask.name||"Click to name"}</span>
               )}
@@ -892,7 +892,7 @@ export default function App() {
                     style={{ background:"none", border:"none", cursor:"pointer", color:"#9CA3AF", fontSize:"0.75rem", padding:"0 2px", flexShrink:0, transform:expanded?"rotate(90deg)":"rotate(0deg)", transition:"transform 0.15s" }}>▶</button>
                   {editing ? (
                     <input autoFocus defaultValue={project.name} onBlur={e => { updateProject(project.id,{name:e.target.value,editing:false}); setEditing(false); }} onKeyDown={e => e.key==="Enter"&&e.target.blur()}
-                      style={{ flex:1, border:"1px solid #9CAF88", borderRadius:5, padding:"4px 10px", fontSize:"0.9rem", fontFamily:"'Lora',serif", color:C.brown, fontWeight:600, minWidth:0 }} />
+                      style={{ flex:1, border:"1px solid #9CAF88", borderRadius:5, padding:"4px 10px", fontSize:"0.9rem", fontFamily:"'Lora',serif", color:C.brown, fontWeight:600, minWidth:0, background:"#fff" }} />
                   ) : (
                     <span onClick={() => setEditing(true)} style={{ flex:1, fontSize:"0.9rem", fontWeight:600, color:project.name?C.brown:"#9CA3AF", cursor:"text", fontStyle:project.name?"normal":"italic", textDecoration:project.status==="Completed"?"line-through":"none", opacity:project.status==="Completed"?0.7:1, minWidth:0, wordBreak:"break-word" }}>
                       {project.name||"Tap to name project"}
