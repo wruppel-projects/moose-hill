@@ -614,8 +614,8 @@ export default function App() {
       {page === "reserve" && (
         <div style={{ maxWidth:1100, margin:"0 auto", padding:"2.5rem 1.5rem" }}>
           <div style={{ marginBottom:"2rem" }}>
-            <div style={{ fontSize:"0.7rem", letterSpacing:"0.2em", textTransform:"uppercase", color:C.muted, marginBottom:8, fontWeight:700 }}>Reservations</div>
-            <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"clamp(1.8rem,4vw,2.6rem)", fontWeight:700, color:C.brown }}>Book Your Stay</h1>
+            <div style={{ fontSize:"0.7rem", letterSpacing:"0.2em", textTransform:"uppercase", color:C.muted, marginBottom:8, fontWeight:700 }}>Stay</div>
+            <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"clamp(1.8rem,4vw,2.6rem)", fontWeight:700, color:C.brown }}>Plan Your Stay</h1>
             <p style={{ color:"#2E5A3E", marginTop:6, fontSize:"0.9rem" }}>Select a room, click your check-in date, then your check-out date.</p>
           </div>
           <div className="main-grid" style={{ display:"grid", gridTemplateColumns:"1fr 290px", gap:"1.5rem", alignItems:"start" }}>
@@ -780,7 +780,7 @@ export default function App() {
               { label:"WiFi Network", value:"Oxferd", large:true },
               { label:"WiFi Password", value:"Zarden1921+", large:true },
               { label:"Garage Door Code", value:"1921 [Enter]", large:true },
-              { label:"Alarm", value:"The alarm keypad is at the back door — best to enter through there. When you open the door, the screen will ask for a code. The alarm code is 1921. When leaving, hit "Press to arm" then "Home". You have 60 seconds to exit. Don't forget to lock the back door, front door, and sliding door to the deck.", large:false },
+              { label:"Alarm", value:"The alarm keypad is at the back door - best to enter through there. When you open the door, the screen will ask for a code. The alarm code is 1921. When leaving, hit 'Press to arm' then 'Home'. You have 60 seconds to exit. Don't forget to lock the back door, front door, and sliding door to the deck.", large:false },
               { label:"Door Key", value:"Your key works on both the front and back doors.", large:false },
             ].map(item => (
               <div key={item.label} style={{ background:C.cream, borderRadius:14, boxShadow:"0 2px 16px rgba(0,0,0,0.07)", padding:"1.4rem 1.6rem", borderLeft:"4px solid "+C.tan }}>
