@@ -885,26 +885,30 @@ export default function App() {
           return (
             <div draggable onDragStart={() => setDragState({id:project.id,fromStatus:project.status})} onDragEnd={() => setDragState(null)}
               style={{ background:"#fff", borderBottom:"1px solid #F3F4F6", cursor:"grab", opacity:dragState&&dragState.id===project.id?0.5:1 }}>
-              <div style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 14px" }}>
-                <span style={{ color:"#D1D5DB", cursor:"grab", fontSize:"0.9rem", userSelect:"none" }}>⠿</span>
-                <button onClick={() => setExpandedProjects(p => ({...p,[project.id]:!p[project.id]}))}
-                  style={{ background:"none", border:"none", cursor:"pointer", color:"#9CA3AF", fontSize:"0.75rem", padding:"0 2px", transform:expanded?"rotate(90deg)":"rotate(0deg)", transition:"transform 0.15s" }}>▶</button>
-                {editing ? (
-                  <input autoFocus defaultValue={project.name} onBlur={e => { updateProject(project.id,{name:e.target.value,editing:false}); setEditing(false); }} onKeyDown={e => e.key==="Enter"&&e.target.blur()}
-                    style={{ flex:1, border:"1px solid #9CAF88", borderRadius:5, padding:"4px 10px", fontSize:"0.9rem", fontFamily:"'Lora',serif", color:C.brown, fontWeight:600 }} />
-                ) : (
-                  <span onClick={() => setEditing(true)} style={{ flex:1, fontSize:"0.9rem", fontWeight:600, color:project.name?C.brown:"#6B7280", cursor:"text", fontStyle:project.name?"normal":"italic", textDecoration:project.status==="Completed"?"line-through":"none", opacity:project.status==="Completed"?0.7:1, background:"#fff", border:"1px solid #E5E7EB", borderRadius:5, padding:"4px 10px", display:"inline-block" }}>
-                    {project.name||"Click to name project"}
-                  </span>
-                )}
-                <StatusBadge value={project.status} onChange={v => updateProject(project.id,{status:v})} />
-                <OwnerField value={project.owner||""} onChange={v => updateProject(project.id,{owner:v})} />
-                <button onClick={() => openNotes(project.id,false,null)}
-                  style={{ background:project.notes?"#FEF3C7":"#F3F4F6", border:"1px solid "+(project.notes?"#FCD34D":"#E5E7EB"), borderRadius:5, padding:"4px 10px", fontSize:"0.75rem", cursor:"pointer", color:project.notes?"#92400E":"#6B7280", whiteSpace:"nowrap" }}>
-                  {project.notes?"📝 Notes":"Notes"}
-                </button>
-                <button onClick={() => deleteProject(project.id)}
-                  style={{ background:"none", border:"none", cursor:"pointer", color:"#D1D5DB", fontSize:"1rem", padding:"2px 6px" }}>✕</button>
+              <div style={{ padding:"10px 14px" }}>
+                <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
+                  <span style={{ color:"#D1D5DB", cursor:"grab", fontSize:"0.9rem", userSelect:"none", flexShrink:0 }}>⠿</span>
+                  <button onClick={() => setExpandedProjects(p => ({...p,[project.id]:!p[project.id]}))}
+                    style={{ background:"none", border:"none", cursor:"pointer", color:"#9CA3AF", fontSize:"0.75rem", padding:"0 2px", flexShrink:0, transform:expanded?"rotate(90deg)":"rotate(0deg)", transition:"transform 0.15s" }}>▶</button>
+                  {editing ? (
+                    <input autoFocus defaultValue={project.name} onBlur={e => { updateProject(project.id,{name:e.target.value,editing:false}); setEditing(false); }} onKeyDown={e => e.key==="Enter"&&e.target.blur()}
+                      style={{ flex:1, border:"1px solid #9CAF88", borderRadius:5, padding:"4px 10px", fontSize:"0.9rem", fontFamily:"'Lora',serif", color:C.brown, fontWeight:600, minWidth:0 }} />
+                  ) : (
+                    <span onClick={() => setEditing(true)} style={{ flex:1, fontSize:"0.9rem", fontWeight:600, color:project.name?C.brown:"#9CA3AF", cursor:"text", fontStyle:project.name?"normal":"italic", textDecoration:project.status==="Completed"?"line-through":"none", opacity:project.status==="Completed"?0.7:1, minWidth:0, wordBreak:"break-word" }}>
+                      {project.name||"Tap to name project"}
+                    </span>
+                  )}
+                  <button onClick={() => deleteProject(project.id)}
+                    style={{ background:"none", border:"none", cursor:"pointer", color:"#D1D5DB", fontSize:"1rem", padding:"2px 6px", flexShrink:0 }}>✕</button>
+                </div>
+                <div style={{ display:"flex", alignItems:"center", gap:8, paddingLeft:36, flexWrap:"wrap" }}>
+                  <StatusBadge value={project.status} onChange={v => updateProject(project.id,{status:v})} />
+                  <OwnerField value={project.owner||""} onChange={v => updateProject(project.id,{owner:v})} />
+                  <button onClick={() => openNotes(project.id,false,null)}
+                    style={{ background:project.notes?"#FEF3C7":"#F3F4F6", border:"1px solid "+(project.notes?"#FCD34D":"#E5E7EB"), borderRadius:5, padding:"4px 10px", fontSize:"0.75rem", cursor:"pointer", color:project.notes?"#92400E":"#6B7280", whiteSpace:"nowrap" }}>
+                    {project.notes?"📝 Notes":"Notes"}
+                  </button>
+                </div>
               </div>
               {expanded && (
                 <div>
