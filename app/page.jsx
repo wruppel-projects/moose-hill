@@ -8,8 +8,8 @@ const IMG_MAP = "/map.jpg";
 
 const PIN = "1921";
 const ROOMS = [
-  { id: "st-bernard", name: "St. Bernard's Room", location: "Downstairs",    color: "#2E5A3E", accent: "#A07850", img: IMG_STBERNARD, emoji: "🐾", desc: "Ground-floor retreat with wide windows overlooking the snow-draped woods." },
-  { id: "taft",       name: "Taft Room",        location: "Upstairs West",  color: "#3B5E4E", accent: "#5A9478", img: IMG_TAFT,      emoji: "🌲", desc: "Vaulted upstairs sanctuary with treetop views to the west." },
+  { id: "st-bernard", name: "St. Bernard's Room", location: "Downstairs",    color: "#8B4513", accent: "#B5651D", img: IMG_STBERNARD, emoji: "🐾", desc: "Ground-floor retreat with wide windows overlooking the snow-draped woods." },
+  { id: "taft",       name: "Taft Room",        location: "Upstairs West",  color: "#1F3D2B", accent: "#2E5A3E", img: IMG_TAFT,      emoji: "🌲", desc: "Vaulted upstairs sanctuary with treetop views to the west." },
   { id: "hamilton",   name: "Hamilton Room",    location: "Upstairs East",  color: "#3A4A6B", accent: "#6B8CBF", img: IMG_HAMILTON,  emoji: "🌄", desc: "Bright east-facing room with a classic iron bed and morning light." },
 ];
 
@@ -974,7 +974,7 @@ export default function App() {
       <footer style={{ background:"#1F3D2B", borderTop:"1px solid #2E5A3E", padding:"2rem 1.5rem", textAlign:"center" }}>
         <div style={{ fontFamily:"'Playfair Display', serif", fontSize:"1rem", color:"#F5EFE4", marginBottom:6 }}>104 Moose Hill Road</div>
         <div style={{ fontSize:"0.75rem", color:C.muted }}>Oxford, Connecticut</div>
-        <div style={{ display:"flex", justifyContent:"center", gap:24, marginTop:16 }}>
+        <div style={{ display:"flex", justifyContent:"center", gap:12, flexWrap:"wrap", maxWidth:480, margin:"16px auto 0" }}>
           {allNavItems.map(n => (
             <button key={n.id} onClick={() => handleNavClick(n.id)}
               style={{ background:"none", border:"none", cursor:"pointer", color:C.muted, fontSize:"0.78rem", fontFamily:"'Lora', serif" }}>
