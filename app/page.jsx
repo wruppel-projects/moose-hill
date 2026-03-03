@@ -263,7 +263,7 @@ export default function App() {
   const navGroups = [
     { label:"Home", id:"home", single:true },
     { label:"Stay", items:[
-      { id:"reserve", label:"Reserve" },
+      { id:"reserve", label:"Plan Your Stay" },
       { id:"calendar", label:"Calendar" },
     ]},
     { label:"The House", items:[
@@ -278,7 +278,7 @@ export default function App() {
   ];
   const allNavItems = [
     { id:"home", label:"Home" },
-    { id:"reserve", label:"Reserve" },
+    { id:"reserve", label:"Plan Your Stay" },
     { id:"calendar", label:"Calendar" },
     { id:"wifi", label:"WiFi & Codes" },
     { id:"appliances", label:"Appliances" },
@@ -779,12 +779,13 @@ export default function App() {
             {[
               { label:"WiFi Network", value:"Oxferd", large:true },
               { label:"WiFi Password", value:"Zarden1921+", large:true },
-              { label:"Door Key", value:"Your key will work on the front and back doors.", large:false },
               { label:"Garage Door Code", value:"1921 [Enter]", large:true },
+              { label:"Alarm", value:"The alarm keypad is at the back door — best to enter through there. When you open the door, the screen will ask for a code. The alarm code is 1921. When leaving, hit "Press to arm" then "Home". You have 60 seconds to exit. Don't forget to lock the back door, front door, and sliding door to the deck.", large:false },
+              { label:"Door Key", value:"Your key works on both the front and back doors.", large:false },
             ].map(item => (
               <div key={item.label} style={{ background:C.cream, borderRadius:14, boxShadow:"0 2px 16px rgba(0,0,0,0.07)", padding:"1.4rem 1.6rem", borderLeft:"4px solid "+C.tan }}>
                 <div style={{ fontSize:"0.7rem", letterSpacing:"0.15em", textTransform:"uppercase", color:C.muted, fontWeight:700, marginBottom:8 }}>{item.label}</div>
-                <div style={{ fontFamily: item.large ? "'Playfair Display', serif" : "inherit", fontSize: item.large ? "1.4rem" : "1rem", fontWeight: item.large ? 700 : 400, color:C.brown, letterSpacing: item.large ? "0.05em" : 0 }}>{item.value}</div>
+                <div style={{ fontFamily: item.large ? "'Playfair Display', serif" : "inherit", fontSize: item.large ? "1.4rem" : "1rem", fontWeight: item.large ? 700 : 400, color:C.brown, letterSpacing: item.large ? "0.05em" : 0, lineHeight:1.6 }}>{item.value}</div>
               </div>
             ))}
           </div>
