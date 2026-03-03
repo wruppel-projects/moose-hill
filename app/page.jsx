@@ -845,8 +845,8 @@ export default function App() {
             <input autoFocus defaultValue={value} onBlur={e => { onChange(e.target.value); setEditing(false); }} onKeyDown={e => e.key==="Enter"&&e.target.blur()}
               style={{ width:90, border:"1px solid #9CAF88", borderRadius:5, padding:"3px 6px", fontSize:"0.78rem", fontFamily:"'Lora',serif", color:C.brown }} />
           ) : (
-            <span onClick={() => setEditing(true)} style={{ minWidth:80, fontSize:"0.78rem", color:value?C.brown:"#9CA3AF", cursor:"text", fontStyle:value?"normal":"italic", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
-              {value||"Owner"}
+            <span onClick={() => setEditing(true)} style={{ minWidth:80, fontSize:"0.78rem", color:value?C.brown:"#6B7280", cursor:"text", fontStyle:value?"normal":"italic", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis", background:"#fff", border:"1px solid #E5E7EB", borderRadius:5, padding:"3px 8px", display:"inline-block" }}>
+              {value||"Add Owner"}
             </span>
           );
         }
@@ -893,7 +893,7 @@ export default function App() {
                   <input autoFocus defaultValue={project.name} onBlur={e => { updateProject(project.id,{name:e.target.value,editing:false}); setEditing(false); }} onKeyDown={e => e.key==="Enter"&&e.target.blur()}
                     style={{ flex:1, border:"1px solid #9CAF88", borderRadius:5, padding:"4px 10px", fontSize:"0.9rem", fontFamily:"'Lora',serif", color:C.brown, fontWeight:600 }} />
                 ) : (
-                  <span onClick={() => setEditing(true)} style={{ flex:1, fontSize:"0.9rem", fontWeight:600, color:project.name?C.brown:"#9CA3AF", cursor:"text", fontStyle:project.name?"normal":"italic", textDecoration:project.status==="Completed"?"line-through":"none", opacity:project.status==="Completed"?0.7:1 }}>
+                  <span onClick={() => setEditing(true)} style={{ flex:1, fontSize:"0.9rem", fontWeight:600, color:project.name?C.brown:"#6B7280", cursor:"text", fontStyle:project.name?"normal":"italic", textDecoration:project.status==="Completed"?"line-through":"none", opacity:project.status==="Completed"?0.7:1, background:"#fff", border:"1px solid #E5E7EB", borderRadius:5, padding:"4px 10px", display:"inline-block" }}>
                     {project.name||"Click to name project"}
                   </span>
                 )}
@@ -945,20 +945,16 @@ export default function App() {
                       onDragOver={e => { e.preventDefault(); dragOverRef.current=status; }}
                       onDrop={() => { if (!dragState||dragState.fromStatus===status) return; updateProject(dragState.id,{status}); setDragState(null); }}
                       style={{ borderRadius:12, overflow:"hidden", boxShadow:"0 2px 12px rgba(0,0,0,0.06)", border:"2px solid "+(dragState&&dragOverRef.current===status&&dragState.fromStatus!==status?ss.accent:"transparent"), transition:"border 0.15s" }}>
-                      <div style={{ background:ss.header, padding:"10px 14px", display:"flex", alignItems:"center", justifyContent:"space-between", borderBottom:"1px solid #E5E7EB" }}>
+                      <div style={{ background:ss.header, padding:"10px 14px", display:"flex", alignItems:"center", gap:10, borderBottom:"1px solid #E5E7EB" }}>
                         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                           <span style={{ width:10, height:10, borderRadius:"50%", background:ss.accent, display:"inline-block" }} />
                           <span style={{ fontFamily:"'Playfair Display', serif", fontWeight:700, fontSize:"1rem", color:C.brown }}>{status}</span>
                           <span style={{ background:"#E5E7EB", color:"#6B7280", borderRadius:10, padding:"1px 8px", fontSize:"0.72rem", fontWeight:600 }}>{sp.length}</span>
                         </div>
-                        <button onClick={() => addProject(status)}
-                          style={{ background:"none", border:"1px solid #D1D5DB", borderRadius:6, padding:"3px 10px", fontSize:"0.75rem", color:"#6B7280", cursor:"pointer" }}>
-                          + Add
-                        </button>
                       </div>
                       <div style={{ background:"#fff" }}>
                         {sp.length===0 ? (
-                          <div style={{ padding:"20px 14px", color:"#D1D5DB", fontSize:"0.85rem", fontStyle:"italic", textAlign:"center" }}>No projects — drag one here or click + Add</div>
+                          <div style={{ padding:"20px 14px", color:"#D1D5DB", fontSize:"0.85rem", fontStyle:"italic", textAlign:"center" }}>No projects — drag one here or use + New Project above</div>
                         ) : sp.map(p => <ProjectRow key={p.id} project={p} />)}
                       </div>
                     </div>
