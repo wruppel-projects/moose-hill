@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 
 const IMG_TAFT = "/taft.jpg";
 const IMG_HAMILTON = "/hamilton.jpg";
@@ -8,14 +8,17 @@ const IMG_MAP = "/map.jpg";
 
 const PIN = "1921";
 const ROOMS = [
-  { id: "st-bernard", name: "St. Bernard Room", location: "Downstairs",    color: "#2E5A3E", accent: "#A07850", img: IMG_STBERNARD, emoji: "🐾", desc: "Ground-floor retreat with wide windows overlooking the snow-draped woods." },
+  { id: "st-bernard", name: "St. Bernard's Room", location: "Downstairs",    color: "#2E5A3E", accent: "#A07850", img: IMG_STBERNARD, emoji: "🐾", desc: "Ground-floor retreat with wide windows overlooking the snow-draped woods." },
   { id: "taft",       name: "Taft Room",        location: "Upstairs West",  color: "#3B5E4E", accent: "#5A9478", img: IMG_TAFT,      emoji: "🌲", desc: "Vaulted upstairs sanctuary with treetop views to the west." },
   { id: "hamilton",   name: "Hamilton Room",    location: "Upstairs East",  color: "#3A4A6B", accent: "#6B8CBF", img: IMG_HAMILTON,  emoji: "🌄", desc: "Bright east-facing room with a classic iron bed and morning light." },
 ];
 
 const PLACES = [
-  { category: "Essentials",         name: "Market 32",                  type: "Grocery Store", distance: "2.0 mi", drive: "6 min",  maps: "https://maps.google.com/?q=Market+32+Oxford+CT",                   hours: "Daily 6am-11pm" },
-  { category: "Essentials",         name: "Ace Hardware by Chatfield",  type: "Hardware Store", distance: "2.0 mi", drive: "6 min",  maps: "https://maps.google.com/?q=Ace+Hardware+Chatfield+Oxford+CT",      hours: "Mon-Fri 7:30am-6pm, Sat 7:30am-5pm, Sun 8am-4pm" },
+  { category: "Essentials and Stores",         name: "Market 32",                  type: "Grocery Store", distance: "2.0 mi", drive: "6 min",  maps: "https://maps.google.com/?q=Market+32+Oxford+CT",                   hours: "Daily 6am-11pm" },
+  { category: "Essentials and Stores",         name: "Dunkin",              type: "Coffee & Donuts", distance: "1.9 mi", drive: "5 min", maps: "https://maps.apple/p/wUIuMh-VXZqTzL" },
+  { category: "Essentials and Stores", name: "Fritz's Snack Bar",   type: "Snack Bar",       distance: "2.0 mi", drive: "5 min", maps: "https://maps.apple/p/YdLNBI2MDU..oD" },
+  { category: "Essentials and Stores", name: "Oxford Liquor Shoppe", type: "Liquor Store",    distance: "2.2 mi", drive: "5 min", maps: "https://maps.apple/p/tVF0u9tQy9SpTQ" },
+  { category: "Essentials and Stores",         name: "Ace Hardware by Chatfield",  type: "Hardware Store", distance: "2.0 mi", drive: "6 min",  maps: "https://maps.google.com/?q=Ace+Hardware+Chatfield+Oxford+CT",      hours: "Mon-Fri 7:30am-6pm, Sat 7:30am-5pm, Sun 8am-4pm" },
   { category: "Parks & Trails",     name: "Southford Falls State Park", type: "Waterfall & Covered Bridge", distance: "3.0 mi", drive: "8 min",  maps: "https://maps.google.com/?q=Southford+Falls+State+Park+CT",        hours: "Open daily" },
   { category: "Parks & Trails",     name: "Jackson Cove Town Park",     type: "Lake Beach & Boat Launch", distance: "4.1 mi", drive: "10 min", maps: "https://maps.google.com/?q=Jackson+Cove+Town+Park+Oxford+CT",     hours: "Daily 7am-8pm" },
   { category: "Parks & Trails",     name: "Rockhouse Hill Sanctuary",   type: "Hiking & MTB Trails", distance: "5.8 mi", drive: "13 min", maps: "https://maps.google.com/?q=Rockhouse+Hill+Sanctuary+Oxford+CT",   hours: "Open daily" },
@@ -62,7 +65,7 @@ export default function App() {
   const [modalOpen, setModalOpen] = useState(false);
   const [cancelTarget, setCancelTarget] = useState(null);
   const [hoveredDay, setHoveredDay] = useState(null);
-  const [placesTab, setPlacesTab] = useState("Essentials");
+  const [placesTab, setPlacesTab] = useState("Essentials and Stores");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const today = formatDate(new Date());
@@ -87,6 +90,61 @@ export default function App() {
       });
     } catch {}
   }
+
+  // ── PROJECTS ──
+  const [projects, setProjects] = useState([]);
+  const [projectsLoaded, setProjectsLoaded] = useState(false);
+  const [notesModal, setNotesModal] = useState(null);
+  const [notesText, setNotesText] = useState("");
+  const [expandedProjects, setExpandedProjects] = useState({});
+  const [dragState, setDragState] = useState(null);
+  const dragOverRef = useRef(null);
+
+  useEffect(() => {
+    if (unlocked && !projectsLoaded) {
+      fetch("/api/projects")
+        .then(r => r.json())
+        .then(data => { if (Array.isArray(data)) setProjects(data); setProjectsLoaded(true); })
+        .catch(() => setProjectsLoaded(true));
+    }
+  }, [unlocked]);
+
+  async function saveProjects(updated) {
+    setProjects(updated);
+    try {
+      await fetch("/api/projects", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(updated) });
+    } catch {}
+  }
+
+  function addProject(status) {
+    const np = { id:Date.now().toString(), name:"", status, owner:"", notes:"", subtasks:[], editing:true };
+    saveProjects([np, ...projects]);
+  }
+  function updateProject(id, changes) { saveProjects(projects.map(p => p.id===id ? {...p,...changes} : p)); }
+  function deleteProject(id) { saveProjects(projects.filter(p => p.id!==id)); }
+  function addSubtask(projectId) {
+    const ns = { id:Date.now().toString(), name:"", status:"Not Started", owner:"", notes:"", editing:true };
+    saveProjects(projects.map(p => p.id===projectId ? {...p, subtasks:[...(p.subtasks||[]),ns]} : p));
+  }
+  function updateSubtask(projectId, subtaskId, changes) {
+    saveProjects(projects.map(p => p.id===projectId ? {...p, subtasks:(p.subtasks||[]).map(s => s.id===subtaskId ? {...s,...changes} : s)} : p));
+  }
+  function deleteSubtask(projectId, subtaskId) {
+    saveProjects(projects.map(p => p.id===projectId ? {...p, subtasks:(p.subtasks||[]).filter(s => s.id!==subtaskId)} : p));
+  }
+  function openNotes(id, isSubtask, parentId) {
+    let text = "";
+    if (isSubtask) { const p = projects.find(x=>x.id===parentId); const s = p&&(p.subtasks||[]).find(x=>x.id===id); text = s?s.notes||"":""; }
+    else { const p = projects.find(x=>x.id===id); text = p?p.notes||"":""; }
+    setNotesText(text); setNotesModal({id, isSubtask, parentId});
+  }
+  function saveNotes() {
+    if (!notesModal) return;
+    if (notesModal.isSubtask) updateSubtask(notesModal.parentId, notesModal.id, {notes:notesText});
+    else updateProject(notesModal.id, {notes:notesText});
+    setNotesModal(null);
+  }
+
 
   const nav = (p) => { setPage(p); setMobileMenuOpen(false); window.scrollTo(0,0); try { sessionStorage.setItem("moosehill-page", p); } catch {} };
 
@@ -202,19 +260,44 @@ export default function App() {
     );
   }
 
-  const navItems = [
-    { id:"home", label:"Home" },
-    { id:"calendar", label:"Calendar" },
-    { id:"reserve", label:"Reserve" },
-    { id:"places", label:"Nearby Places" },
+  const navGroups = [
+    { label:"Home", id:"home", single:true },
+    { label:"Stay", items:[
+      { id:"reserve", label:"Reserve" },
+      { id:"calendar", label:"Calendar" },
+    ]},
+    { label:"The House", items:[
+      { id:"wifi", label:"WiFi & Codes" },
+      { id:"appliances", label:"Appliances" },
+      { id:"projects", label:"Projects" },
+    ]},
+    { label:"Explore", items:[
+      { id:"places", label:"Nearby Places" },
+      { id:"oxford", label:"Oxford, CT" },
+    ]},
   ];
+  const allNavItems = [
+    { id:"home", label:"Home" },
+    { id:"reserve", label:"Reserve" },
+    { id:"calendar", label:"Calendar" },
+    { id:"wifi", label:"WiFi & Codes" },
+    { id:"appliances", label:"Appliances" },
+    { id:"projects", label:"Projects" },
+    { id:"places", label:"Nearby Places" },
+    { id:"oxford", label:"Oxford, CT" },
+  ];
+  function handleNavClick(id) {
+    if (id === "oxford") { window.open("/Oxford.pdf","_blank"); return; }
+    nav(id);
+  }
 
   if (!unlocked) {
     return (
-      <div style={{ minHeight:"100vh", background:"#1F3D2B", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"Georgia, serif", padding:"2rem" }}>
+      <div style={{ minHeight:"100vh", background:"#F4F1E8", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"Georgia, serif", padding:"2rem" }}>
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:wght@400;500;600&display=swap" rel="stylesheet" />
         <div style={{ textAlign:"center", maxWidth:400, width:"100%" }}>
-          <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"2rem", fontWeight:900, color:"#F5EFE4", marginBottom:4 }}>104 Moose Hill Road</h1>
+          <div style={{ width:"100%", borderRadius:16, overflow:"hidden", marginBottom:24, boxShadow:"0 4px 20px rgba(31,61,43,0.15)" }}><img src="/HomepageImage.jpeg" alt="104 Moose Hill Road" style={{ width:"100%", height:"auto", display:"block" }} /></div>
+          <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"2rem", fontWeight:900, color:"#1F3D2B", marginBottom:4 }}>104 Moose Hill Road</h1>
           <p style={{ fontFamily:"'Playfair Display', serif", fontStyle:"italic", color:"#9CAF88", marginBottom:36, fontSize:"0.95rem" }}>Oxford, Connecticut</p>
           <div style={{ background:"#2C1F14", borderRadius:16, padding:"2rem", boxShadow:"0 8px 40px rgba(0,0,0,0.4)" }}>
             <p style={{ color:"#fff", fontSize:"0.82rem", letterSpacing:"0.1em", textTransform:"uppercase", fontWeight:700, marginBottom:16 }}>Family Access PIN</p>
@@ -271,12 +354,29 @@ export default function App() {
             <div style={{ fontFamily:"'Playfair Display', serif", fontSize:"1.1rem", fontWeight:700, color:"#F5EFE4" }}>104 Moose Hill Road</div>
             <div style={{ fontSize:"0.65rem", color:"#9CAF88", letterSpacing:"0.12em", textTransform:"uppercase" }}>Oxford, Connecticut</div>
           </button>
-          <div className="desktop-nav" style={{ display:"flex", gap:4 }}>
-            {navItems.map(n => (
-              <button key={n.id} className="nav-btn" onClick={() => nav(n.id)}
-                style={{ background:"none", border:"none", cursor:"pointer", padding:"8px 14px", fontFamily:"'Lora', serif", fontSize:"0.85rem", color: page===n.id ? "#9CAF88" : "#E8F0E9", fontWeight: page===n.id ? 600 : 400, borderBottom: page===n.id ? "2px solid #9CAF88" : "2px solid transparent", transition:"all 0.15s" }}>
-                {n.label}
+          <div className="desktop-nav" style={{ display:"flex", gap:4, alignItems:"center" }}>
+            {navGroups.map(g => g.single ? (
+              <button key={g.id} className="nav-btn" onClick={() => handleNavClick(g.id)}
+                style={{ background:"none", border:"none", cursor:"pointer", padding:"8px 14px", fontFamily:"'Lora', serif", fontSize:"0.85rem", color: page===g.id ? "#9CAF88" : "#E8F0E9", fontWeight: page===g.id ? 600 : 400, borderBottom: page===g.id ? "2px solid #9CAF88" : "2px solid transparent", transition:"all 0.15s" }}>
+                {g.label}
               </button>
+            ) : (
+              <div key={g.label} style={{ position:"relative" }}
+                onMouseEnter={e => e.currentTarget.querySelector(".nav-dropdown").style.display="block"}
+                onMouseLeave={e => e.currentTarget.querySelector(".nav-dropdown").style.display="none"}>
+                <button className="nav-btn"
+                  style={{ background:"none", border:"none", cursor:"pointer", padding:"8px 14px", fontFamily:"'Lora', serif", fontSize:"0.85rem", color: g.items.some(i => i.id===page) ? "#9CAF88" : "#E8F0E9", fontWeight: g.items.some(i => i.id===page) ? 600 : 400, borderBottom: g.items.some(i => i.id===page) ? "2px solid #9CAF88" : "2px solid transparent", transition:"all 0.15s" }}>
+                  {g.label} ▾
+                </button>
+                <div className="nav-dropdown" style={{ display:"none", position:"absolute", top:"100%", left:0, background:"rgba(31,61,43,0.98)", borderRadius:8, boxShadow:"0 8px 32px rgba(0,0,0,0.4)", minWidth:160, zIndex:500, overflow:"hidden", border:"1px solid #2E5A3E" }}>
+                  {g.items.map(item => (
+                    <button key={item.id} onClick={() => handleNavClick(item.id)}
+                      style={{ display:"block", width:"100%", textAlign:"left", padding:"11px 18px", background:"none", border:"none", borderBottom:"1px solid #2E5A3E", cursor:"pointer", fontFamily:"'Lora', serif", fontSize:"0.85rem", color: page===item.id ? "#9CAF88" : "#E8F0E9" }}>
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
           <button className="mobile-btn" onClick={() => setMobileMenuOpen(v => !v)}
@@ -286,11 +386,21 @@ export default function App() {
         </div>
         {mobileMenuOpen && (
           <div className="mobile-nav" style={{ background:"#1F3D2B", borderTop:"1px solid #2E5A3E" }}>
-            {navItems.map(n => (
-              <button key={n.id} onClick={() => nav(n.id)}
-                style={{ display:"block", width:"100%", textAlign:"left", padding:"12px 1.5rem", background:"none", border:"none", cursor:"pointer", fontFamily:"'Lora', serif", fontSize:"0.95rem", color: page===n.id ? "#9CAF88" : "#E8F0E9" }}>
-                {n.label}
+            {navGroups.map(g => g.single ? (
+              <button key={g.id} onClick={() => handleNavClick(g.id)}
+                style={{ display:"block", width:"100%", textAlign:"left", padding:"12px 1.5rem", background:"none", border:"none", cursor:"pointer", fontFamily:"'Lora', serif", fontSize:"0.95rem", color: page===g.id ? "#9CAF88" : "#E8F0E9" }}>
+                {g.label}
               </button>
+            ) : (
+              <div key={g.label}>
+                <div style={{ padding:"10px 1.5rem 4px", fontSize:"0.65rem", letterSpacing:"0.15em", textTransform:"uppercase", color:"#4F6F52", fontFamily:"'Lora', serif" }}>{g.label}</div>
+                {g.items.map(item => (
+                  <button key={item.id} onClick={() => handleNavClick(item.id)}
+                    style={{ display:"block", width:"100%", textAlign:"left", padding:"10px 1.5rem 10px 2.2rem", background:"none", border:"none", cursor:"pointer", fontFamily:"'Lora', serif", fontSize:"0.9rem", color: page===item.id ? "#9CAF88" : "#E8F0E9" }}>
+                    {item.label}
+                  </button>
+                ))}
+              </div>
             ))}
           </div>
         )}
@@ -306,27 +416,45 @@ export default function App() {
       {/* HOME PAGE */}
       {page === "home" && (
         <div>
-          <div style={{ background:"#1F3D2B", position:"relative", overflow:"hidden", minHeight:"85vh", display:"flex", alignItems:"center", justifyContent:"center" }}>
-            <div style={{ position:"absolute", inset:0, opacity:0.04, background:"radial-gradient(circle, #fff 1px, transparent 1px)", backgroundSize:"24px 24px" }} />
+          <div style={{ background:"#EAF0EA", position:"relative", overflow:"hidden", minHeight:"85vh", display:"flex", alignItems:"center", justifyContent:"center" }}>
+            <div style={{ position:"absolute", inset:0, opacity:0.08, background:"radial-gradient(circle, #1F3D2B 1px, transparent 1px)", backgroundSize:"24px 24px" }} />
             <div style={{ textAlign:"center", padding:"4rem 2rem", position:"relative", zIndex:1 }}>
-              <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"clamp(2.8rem,7vw,5.5rem)", fontWeight:900, color:"#F5EFE4", letterSpacing:"-0.02em", lineHeight:1, marginBottom:12 }}>
+              <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"clamp(1.8rem,4vw,3.2rem)", fontWeight:900, color:"#1F3D2B", letterSpacing:"-0.02em", lineHeight:1, marginBottom:12 }}>
                 104 Moose Hill Road
               </h1>
-              <p style={{ fontFamily:"'Playfair Display', serif", fontStyle:"italic", fontSize:"clamp(1rem,2.5vw,1.4rem)", color:C.tan, marginBottom:40 }}>
+              <p style={{ fontFamily:"'Playfair Display', serif", fontStyle:"italic", fontSize:"clamp(1.2rem,3vw,1.8rem)", color:"#4F6F52", marginBottom:40 }}>
                 Oxford, Connecticut
               </p>
-              <div style={{ display:"flex", gap:16, justifyContent:"center", flexWrap:"wrap" }}>
+              <div style={{ display:"flex", gap:16, justifyContent:"center", flexWrap:"wrap", marginBottom:16 }}>
                 <button onClick={() => nav("reserve")}
-                  style={{ padding:"15px 36px", background:C.tan, color:C.dark, border:"none", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"1rem", fontWeight:600, cursor:"pointer" }}>
+                  style={{ padding:"15px 36px", background:"#1F3D2B", color:"#F4F1E8", border:"none", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"1rem", fontWeight:600, cursor:"pointer" }}>
                   Reserve a Room
                 </button>
                 <button onClick={() => nav("calendar")}
                   style={{ padding:"15px 36px", background:"transparent", color:"#1F3D2B", border:"1.5px solid #1F3D2B", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"1rem", cursor:"pointer" }}>
                   See Calendar
                 </button>
+              </div>
+              <div style={{ display:"flex", gap:10, justifyContent:"center", flexWrap:"wrap" }}>
+                <button onClick={() => nav("wifi")}
+                  style={{ padding:"9px 20px", background:"transparent", color:"#1F3D2B", border:"1.5px solid #2E5A3E", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"0.82rem", cursor:"pointer" }}>
+                  WiFi & Codes
+                </button>
+                <button onClick={() => window.open("/Oxford.pdf","_blank")}
+                  style={{ padding:"9px 20px", background:"transparent", color:"#1F3D2B", border:"1.5px solid #2E5A3E", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"0.82rem", cursor:"pointer" }}>
+                  Oxford, CT
+                </button>
                 <button onClick={() => nav("places")}
-                  style={{ padding:"15px 36px", background:"transparent", color:"#1F3D2B", border:"1.5px solid #1F3D2B", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"1rem", cursor:"pointer" }}>
+                  style={{ padding:"9px 20px", background:"transparent", color:"#1F3D2B", border:"1.5px solid #2E5A3E", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"0.82rem", cursor:"pointer" }}>
                   Explore Nearby
+                </button>
+                <button onClick={() => nav("appliances")}
+                  style={{ padding:"9px 20px", background:"transparent", color:"#1F3D2B", border:"1.5px solid #2E5A3E", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"0.82rem", cursor:"pointer" }}>
+                  Appliances
+                </button>
+                <button onClick={() => nav("projects")}
+                  style={{ padding:"9px 20px", background:"transparent", color:"#1F3D2B", border:"1.5px solid #2E5A3E", borderRadius:8, fontFamily:"'Lora', serif", fontSize:"0.82rem", cursor:"pointer" }}>
+                  Projects
                 </button>
               </div>
             </div>
@@ -633,13 +761,222 @@ export default function App() {
         </div>
       )}
 
+      {/* WIFI PAGE */}
+      {page === "wifi" && (
+        <div style={{ maxWidth:600, margin:"0 auto", padding:"2.5rem 1.5rem" }}>
+          <div style={{ marginBottom:"2rem" }}>
+            <div style={{ fontSize:"0.7rem", letterSpacing:"0.2em", textTransform:"uppercase", color:C.muted, marginBottom:8, fontWeight:700 }}>Access</div>
+            <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"clamp(1.8rem,4vw,2.6rem)", fontWeight:700, color:C.brown }}>WiFi & Codes</h1>
+          </div>
+          <div style={{ display:"flex", flexDirection:"column", gap:"1rem" }}>
+            {[
+              { label:"WiFi Network", value:"Oxferd", large:true },
+              { label:"WiFi Password", value:"Zarden1921+", large:true },
+              { label:"Door Key", value:"Your key will work on the front and back doors.", large:false },
+              { label:"Garage Door Code", value:"1921 [Enter]", large:true },
+            ].map(item => (
+              <div key={item.label} style={{ background:C.cream, borderRadius:14, boxShadow:"0 2px 16px rgba(0,0,0,0.07)", padding:"1.4rem 1.6rem", borderLeft:"4px solid "+C.tan }}>
+                <div style={{ fontSize:"0.7rem", letterSpacing:"0.15em", textTransform:"uppercase", color:C.muted, fontWeight:700, marginBottom:8 }}>{item.label}</div>
+                <div style={{ fontFamily: item.large ? "'Playfair Display', serif" : "inherit", fontSize: item.large ? "1.4rem" : "1rem", fontWeight: item.large ? 700 : 400, color:C.brown, letterSpacing: item.large ? "0.05em" : 0 }}>{item.value}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* APPLIANCES PAGE */}
+      {page === "appliances" && (
+        <div style={{ maxWidth:700, margin:"0 auto", padding:"2.5rem 1.5rem" }}>
+          <div style={{ marginBottom:"2rem" }}>
+            <div style={{ fontSize:"0.7rem", letterSpacing:"0.2em", textTransform:"uppercase", color:C.muted, marginBottom:8, fontWeight:700 }}>Reference</div>
+            <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"clamp(1.8rem,4vw,2.6rem)", fontWeight:700, color:C.brown }}>Appliance User Manuals</h1>
+            <p style={{ color:C.muted, marginTop:6, fontSize:"0.9rem" }}>Links open the manufacturer manual in a new tab.</p>
+          </div>
+          <div style={{ background:C.cream, borderRadius:16, boxShadow:"0 2px 20px rgba(0,0,0,0.07)", overflow:"hidden" }}>
+            {[
+              { name:"HVAC",         icon:"❄️",  url:"https://iaq.na.panasonic.com/hubfs/PCI%20-%20Panasonic%20North%20America%20Canada/IAQ/HVAC%20Resources/Operating-Manual_CS-XZ_CS-MXZ_CU-XZ_CU-xZxxABUC_CU-xZxxBBUC_English_Nov_2025_Bill29.pdf?hsLang=en" },
+              { name:"Dryer",        icon:"🌀",  url:"https://www.whirlpool.com/results.html?term=wed5010&tab=clp&plp=WED5010LW%253Arelevance&plpView=grid&clp=wed5010%253Adoc_type%253Aowners-manual&currentPage=0" },
+              { name:"Washer",       icon:"🫧",  url:"https://www.whirlpool.com/content/dam/global/documents/202305/owners-manual-w11654314-revB.pdf" },
+              { name:"Stove",        icon:"🔥",  url:"https://www.whirlpool.com/content/dam/global/documents/202409/owners-manual-w11640308-revc.pdf" },
+              { name:"Refrigerator", icon:"🧊",  url:"https://www.whirlpool.com/content/dam/global/documents/202406/owners-manual-w11727207-revA.pdf" },
+              { name:"Microwave",    icon:"📡",  url:"https://www.whirlpool.com/content/dam/global/documents/201809/use-and-care-w11247855-revA.pdf" },
+              { name:"Dishwasher",   icon:"🍽️", url:"https://www.whirlpool.com/content/dam/global/documents/202304/owners-manual-w11532445-revD.pdf" },
+            ].map((item, i, arr) => (
+              <a key={item.name} href={item.url} target="_blank" rel="noopener noreferrer"
+                style={{ display:"flex", alignItems:"center", gap:16, padding:"16px 20px", borderBottom: i<arr.length-1 ? "1px solid #EAE4DA" : "none", textDecoration:"none", background: i%2===0 ? "#fff" : C.cream }}
+                onMouseEnter={e => e.currentTarget.style.background="#E8F0E9"}
+                onMouseLeave={e => e.currentTarget.style.background= i%2===0 ? "#fff" : C.cream}>
+                <span style={{ fontSize:"1.5rem", width:32, textAlign:"center" }}>{item.icon}</span>
+                <span style={{ fontFamily:"'Playfair Display', serif", fontSize:"1rem", fontWeight:600, color:C.brown, flex:1 }}>{item.name}</span>
+                <span style={{ fontSize:"0.8rem", color:C.tan, fontWeight:600 }}>View Manual &#8599;</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* PROJECTS PAGE */}
+      {page === "projects" && (() => {
+        const STATUSES = ["Not Started","In Progress","Completed"];
+        const STATUS_STYLE = {
+          "Not Started": { bg:"#F3F4F6", color:"#4B5563", border:"#D1D5DB" },
+          "In Progress": { bg:"#EFF6FF", color:"#1D4ED8", border:"#BFDBFE" },
+          "Completed":   { bg:"#F0FDF4", color:"#15803D", border:"#BBF7D0" },
+        };
+        const SECTION_STYLE = {
+          "Not Started": { header:"#F9FAFB", accent:"#6B7280" },
+          "In Progress": { header:"#EFF6FF", accent:"#2563EB" },
+          "Completed":   { header:"#F0FDF4", accent:"#16A34A" },
+        };
+
+        function StatusBadge({ value, onChange }) {
+          const s = STATUS_STYLE[value]||STATUS_STYLE["Not Started"];
+          return (
+            <select value={value} onChange={e => onChange(e.target.value)}
+              style={{ appearance:"none", WebkitAppearance:"none", background:s.bg, color:s.color, border:"1px solid "+s.border, borderRadius:6, padding:"3px 10px", fontSize:"0.75rem", fontWeight:600, cursor:"pointer", fontFamily:"'Lora', serif" }}>
+              {STATUSES.map(st => <option key={st} value={st}>{st}</option>)}
+            </select>
+          );
+        }
+
+        function OwnerField({ value, onChange }) {
+          const [editing, setEditing] = useState(false);
+          return editing ? (
+            <input autoFocus defaultValue={value} onBlur={e => { onChange(e.target.value); setEditing(false); }} onKeyDown={e => e.key==="Enter"&&e.target.blur()}
+              style={{ width:90, border:"1px solid #9CAF88", borderRadius:5, padding:"3px 6px", fontSize:"0.78rem", fontFamily:"'Lora',serif", color:C.brown }} />
+          ) : (
+            <span onClick={() => setEditing(true)} style={{ minWidth:80, fontSize:"0.78rem", color:value?C.brown:"#9CA3AF", cursor:"text", fontStyle:value?"normal":"italic", whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+              {value||"Owner"}
+            </span>
+          );
+        }
+
+        function SubtaskRow({ subtask, projectId }) {
+          const [editing, setEditing] = useState(subtask.editing||false);
+          const ss = STATUS_STYLE[subtask.status||"Not Started"];
+          return (
+            <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 12px 8px 48px", borderBottom:"1px solid #F3F4F6", background:"#FAFAFA" }}>
+              <span style={{ color:"#D1D5DB", fontSize:"0.8rem" }}>↳</span>
+              {editing ? (
+                <input autoFocus defaultValue={subtask.name} onBlur={e => { updateSubtask(projectId,subtask.id,{name:e.target.value,editing:false}); setEditing(false); }} onKeyDown={e => e.key==="Enter"&&e.target.blur()}
+                  style={{ flex:1, border:"1px solid #9CAF88", borderRadius:5, padding:"3px 8px", fontSize:"0.85rem", fontFamily:"'Lora',serif", color:C.brown }} />
+              ) : (
+                <span onClick={() => setEditing(true)} style={{ flex:1, fontSize:"0.85rem", color:subtask.name?C.brown:"#9CA3AF", cursor:"text", fontStyle:subtask.name?"normal":"italic" }}>{subtask.name||"Click to name"}</span>
+              )}
+              <select value={subtask.status||"Not Started"} onChange={e => updateSubtask(projectId,subtask.id,{status:e.target.value})}
+                style={{ appearance:"none", WebkitAppearance:"none", background:ss.bg, color:ss.color, border:"1px solid "+ss.border, borderRadius:6, padding:"3px 8px", fontSize:"0.72rem", fontWeight:600, cursor:"pointer", fontFamily:"'Lora',serif" }}>
+                {STATUSES.map(st => <option key={st} value={st}>{st}</option>)}
+              </select>
+              <OwnerField value={subtask.owner||""} onChange={v => updateSubtask(projectId,subtask.id,{owner:v})} />
+              <button onClick={() => openNotes(subtask.id,true,projectId)}
+                style={{ background:subtask.notes?"#FEF3C7":"#F3F4F6", border:"1px solid "+(subtask.notes?"#FCD34D":"#E5E7EB"), borderRadius:5, padding:"3px 8px", fontSize:"0.72rem", cursor:"pointer", color:subtask.notes?"#92400E":"#6B7280", whiteSpace:"nowrap" }}>
+                {subtask.notes?"📝 Notes":"Notes"}
+              </button>
+              <button onClick={() => deleteSubtask(projectId,subtask.id)}
+                style={{ background:"none", border:"none", cursor:"pointer", color:"#D1D5DB", fontSize:"0.9rem", padding:"2px 4px" }}>✕</button>
+            </div>
+          );
+        }
+
+        function ProjectRow({ project }) {
+          const [editing, setEditing] = useState(project.editing||false);
+          const expanded = expandedProjects[project.id];
+          const subtasks = project.subtasks||[];
+          return (
+            <div draggable onDragStart={() => setDragState({id:project.id,fromStatus:project.status})} onDragEnd={() => setDragState(null)}
+              style={{ background:"#fff", borderBottom:"1px solid #F3F4F6", cursor:"grab", opacity:dragState&&dragState.id===project.id?0.5:1 }}>
+              <div style={{ display:"flex", alignItems:"center", gap:8, padding:"10px 14px" }}>
+                <span style={{ color:"#D1D5DB", cursor:"grab", fontSize:"0.9rem", userSelect:"none" }}>⠿</span>
+                <button onClick={() => setExpandedProjects(p => ({...p,[project.id]:!p[project.id]}))}
+                  style={{ background:"none", border:"none", cursor:"pointer", color:"#9CA3AF", fontSize:"0.75rem", padding:"0 2px", transform:expanded?"rotate(90deg)":"rotate(0deg)", transition:"transform 0.15s" }}>▶</button>
+                {editing ? (
+                  <input autoFocus defaultValue={project.name} onBlur={e => { updateProject(project.id,{name:e.target.value,editing:false}); setEditing(false); }} onKeyDown={e => e.key==="Enter"&&e.target.blur()}
+                    style={{ flex:1, border:"1px solid #9CAF88", borderRadius:5, padding:"4px 10px", fontSize:"0.9rem", fontFamily:"'Lora',serif", color:C.brown, fontWeight:600 }} />
+                ) : (
+                  <span onClick={() => setEditing(true)} style={{ flex:1, fontSize:"0.9rem", fontWeight:600, color:project.name?C.brown:"#9CA3AF", cursor:"text", fontStyle:project.name?"normal":"italic", textDecoration:project.status==="Completed"?"line-through":"none", opacity:project.status==="Completed"?0.7:1 }}>
+                    {project.name||"Click to name project"}
+                  </span>
+                )}
+                <StatusBadge value={project.status} onChange={v => updateProject(project.id,{status:v})} />
+                <OwnerField value={project.owner||""} onChange={v => updateProject(project.id,{owner:v})} />
+                <button onClick={() => openNotes(project.id,false,null)}
+                  style={{ background:project.notes?"#FEF3C7":"#F3F4F6", border:"1px solid "+(project.notes?"#FCD34D":"#E5E7EB"), borderRadius:5, padding:"4px 10px", fontSize:"0.75rem", cursor:"pointer", color:project.notes?"#92400E":"#6B7280", whiteSpace:"nowrap" }}>
+                  {project.notes?"📝 Notes":"Notes"}
+                </button>
+                <button onClick={() => deleteProject(project.id)}
+                  style={{ background:"none", border:"none", cursor:"pointer", color:"#D1D5DB", fontSize:"1rem", padding:"2px 6px" }}>✕</button>
+              </div>
+              {expanded && (
+                <div>
+                  {subtasks.map(s => <SubtaskRow key={s.id} subtask={s} projectId={project.id} />)}
+                  <div style={{ padding:"6px 14px 8px 48px" }}>
+                    <button onClick={() => { addSubtask(project.id); setExpandedProjects(p => ({...p,[project.id]:true})); }}
+                      style={{ background:"none", border:"1px dashed #D1D5DB", borderRadius:5, padding:"4px 12px", fontSize:"0.78rem", color:"#9CA3AF", cursor:"pointer" }}>
+                      + Add subtask
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        return (
+          <div style={{ maxWidth:900, margin:"0 auto", padding:"2rem 1rem" }}>
+            <div style={{ marginBottom:"1.5rem", display:"flex", alignItems:"flex-end", justifyContent:"space-between" }}>
+              <div>
+                <div style={{ fontSize:"0.7rem", letterSpacing:"0.2em", textTransform:"uppercase", color:C.muted, marginBottom:6, fontWeight:700 }}>The House</div>
+                <h1 style={{ fontFamily:"'Playfair Display', serif", fontSize:"clamp(1.8rem,4vw,2.4rem)", fontWeight:700, color:C.brown, margin:0 }}>Projects</h1>
+              </div>
+              <button onClick={() => addProject("Not Started")}
+                style={{ background:"#1F3D2B", color:"#F4F1E8", border:"none", borderRadius:8, padding:"10px 20px", fontFamily:"'Lora',serif", fontSize:"0.88rem", fontWeight:600, cursor:"pointer" }}>
+                + New Project
+              </button>
+            </div>
+            {!projectsLoaded ? (
+              <div style={{ textAlign:"center", padding:"3rem", color:C.muted }}>Loading projects…</div>
+            ) : (
+              <div style={{ display:"flex", flexDirection:"column", gap:"1.5rem" }}>
+                {STATUSES.map(status => {
+                  const sp = projects.filter(p => p.status===status);
+                  const ss = SECTION_STYLE[status];
+                  return (
+                    <div key={status}
+                      onDragOver={e => { e.preventDefault(); dragOverRef.current=status; }}
+                      onDrop={() => { if (!dragState||dragState.fromStatus===status) return; updateProject(dragState.id,{status}); setDragState(null); }}
+                      style={{ borderRadius:12, overflow:"hidden", boxShadow:"0 2px 12px rgba(0,0,0,0.06)", border:"2px solid "+(dragState&&dragOverRef.current===status&&dragState.fromStatus!==status?ss.accent:"transparent"), transition:"border 0.15s" }}>
+                      <div style={{ background:ss.header, padding:"10px 14px", display:"flex", alignItems:"center", justifyContent:"space-between", borderBottom:"1px solid #E5E7EB" }}>
+                        <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+                          <span style={{ width:10, height:10, borderRadius:"50%", background:ss.accent, display:"inline-block" }} />
+                          <span style={{ fontFamily:"'Playfair Display', serif", fontWeight:700, fontSize:"1rem", color:C.brown }}>{status}</span>
+                          <span style={{ background:"#E5E7EB", color:"#6B7280", borderRadius:10, padding:"1px 8px", fontSize:"0.72rem", fontWeight:600 }}>{sp.length}</span>
+                        </div>
+                        <button onClick={() => addProject(status)}
+                          style={{ background:"none", border:"1px solid #D1D5DB", borderRadius:6, padding:"3px 10px", fontSize:"0.75rem", color:"#6B7280", cursor:"pointer" }}>
+                          + Add
+                        </button>
+                      </div>
+                      <div style={{ background:"#fff" }}>
+                        {sp.length===0 ? (
+                          <div style={{ padding:"20px 14px", color:"#D1D5DB", fontSize:"0.85rem", fontStyle:"italic", textAlign:"center" }}>No projects — drag one here or click + Add</div>
+                        ) : sp.map(p => <ProjectRow key={p.id} project={p} />)}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
       {/* FOOTER */}
       <footer style={{ background:"#1F3D2B", borderTop:"1px solid #2E5A3E", padding:"2rem 1.5rem", textAlign:"center" }}>
         <div style={{ fontFamily:"'Playfair Display', serif", fontSize:"1rem", color:"#F5EFE4", marginBottom:6 }}>104 Moose Hill Road</div>
         <div style={{ fontSize:"0.75rem", color:C.muted }}>Oxford, Connecticut</div>
         <div style={{ display:"flex", justifyContent:"center", gap:24, marginTop:16 }}>
-          {navItems.map(n => (
-            <button key={n.id} onClick={() => nav(n.id)}
+          {allNavItems.map(n => (
+            <button key={n.id} onClick={() => handleNavClick(n.id)}
               style={{ background:"none", border:"none", cursor:"pointer", color:C.muted, fontSize:"0.78rem", fontFamily:"'Lora', serif" }}>
               {n.label}
             </button>
@@ -647,13 +984,31 @@ export default function App() {
         </div>
       </footer>
 
+      {/* NOTES MODAL */}
+      {notesModal && (
+        <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.55)", zIndex:500, display:"flex", alignItems:"center", justifyContent:"center", padding:"1rem" }}
+          onClick={e => e.target===e.currentTarget&&setNotesModal(null)}>
+          <div style={{ background:"#fff", borderRadius:16, padding:"1.8rem", width:"100%", maxWidth:480, boxShadow:"0 12px 60px rgba(0,0,0,0.25)" }}>
+            <div style={{ fontFamily:"'Playfair Display', serif", fontSize:"1.2rem", fontWeight:700, color:C.brown, marginBottom:16 }}>Notes</div>
+            <textarea value={notesText} onChange={e => setNotesText(e.target.value)} autoFocus placeholder="Add notes here..."
+              style={{ width:"100%", minHeight:160, border:"1.5px solid #E5E7EB", borderRadius:8, padding:"10px 12px", fontFamily:"'Lora',serif", fontSize:"0.9rem", color:C.brown, resize:"vertical", outline:"none", boxSizing:"border-box" }} />
+            <div style={{ display:"flex", gap:10, marginTop:14, justifyContent:"flex-end" }}>
+              <button onClick={() => setNotesModal(null)}
+                style={{ background:"none", border:"1px solid #E5E7EB", borderRadius:8, padding:"8px 18px", fontFamily:"'Lora',serif", fontSize:"0.85rem", color:"#6B7280", cursor:"pointer" }}>Cancel</button>
+              <button onClick={saveNotes}
+                style={{ background:"#1F3D2B", color:"#F4F1E8", border:"none", borderRadius:8, padding:"8px 20px", fontFamily:"'Lora',serif", fontSize:"0.85rem", fontWeight:600, cursor:"pointer" }}>Save</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* BOOKING MODAL */}
       {modalOpen && sel.start && (
         <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.55)", zIndex:400, display:"flex", alignItems:"center", justifyContent:"center", padding:"1rem" }}
           onClick={e => e.target === e.currentTarget && setModalOpen(false)}>
           <div style={{ background:"#fff", borderRadius:18, padding:"2rem", width:"100%", maxWidth:420, boxShadow:"0 12px 60px rgba(0,0,0,0.25)" }}>
             <div style={{ fontFamily:"'Playfair Display', serif", fontSize:"1.5rem", fontWeight:700, color:C.brown, marginBottom:2 }}>{room.name}</div>
-            <div style={{ fontSize:"0.82rem", color:C.muted, marginBottom:16 }}>{formatDisplay(sel.start)}{sel.end && sel.end !== sel.start ? " to " + formatDisplay(sel.end) : ""}</div>
+            <div style={{ fontSize:"1.05rem", color:C.brown, fontWeight:600, marginBottom:16 }}>{formatDisplay(sel.start)}{sel.end && sel.end !== sel.start ? " to " + formatDisplay(sel.end) : ""}</div>
             {formError && <div style={{ background:"#FDEAEA", color:"#C0392B", borderRadius:7, padding:"8px 12px", fontSize:"0.82rem", marginBottom:12 }}>{formError}</div>}
             {[
               { label:"Your Name", key:"name", placeholder:"e.g. Jane Smith" },
